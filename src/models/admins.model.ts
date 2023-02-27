@@ -1,7 +1,3 @@
-/**
- * Admin schema
- * @author Yousuf Kalim
- */
 import { model, Schema, Document } from 'mongoose';
 import Admin from '@interfaces/admins.interface';
 
@@ -14,9 +10,10 @@ const adminSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
-      lowercase: true,
+    },
+    Bio: {
+      type: String,
     },
     password: {
       type: String,
@@ -26,7 +23,6 @@ const adminSchema = new Schema(
     role: {
       type: String,
       default: 'admin',
-      enum: ['admin', 'superadmin'],
     },
     active: {
       type: Boolean,

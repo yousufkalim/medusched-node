@@ -3,10 +3,10 @@
  * @author Yousuf Kalim
  */
 import { Request } from 'express';
-import User from './users.interface';
 import Admin from './admins.interface';
+import Hospital from './hospitals.interface';
 
 export default interface IRequest extends Request {
-  user?: User | Admin;
+  user?: Hospital | Admin;
   token?: string;
 }

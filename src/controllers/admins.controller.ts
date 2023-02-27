@@ -18,29 +18,22 @@ import Auth from '@interfaces/auth.interface';
  */
 export const register = async (req: Request, res: Response): Promise<Response> => {
   const body: Admin & { confirmPassword: string } = req.body;
-
   try {
-    const { email, password, confirmPassword } = body; // Getting required fields from body
+    const { email, password } = body; // Getting required fields from body
     const existingAdmin = await Admins.findOne({ email }); // Finding already existing user
 
     // Extra Validations
     if (existingAdmin) {
       // If we found existing user in db
       return res.status(409).json({ success: false, message: 'Admin already exists.' });
-    } else if (password !== confirmPassword) {
-      // Passwords not same
-      return res.status(400).json({
-        success: false,
-        message: 'Password and Confirm Password are not same.',
-      });
     }
 
     // Creating User
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    const admin = await Admins.create(body); // Adding user in db
+    await Admins.create(body); // Adding user in db
 
     // Done
-    return res.json({ success: true, admin }); // Success
+    return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -60,6 +53,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   try {
     // Getting email and password
     const { email, password } = body;
+    console.log(email, password);
 
     // Getting user from db
     const admin = await Admins.findOne({ email });
