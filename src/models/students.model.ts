@@ -22,7 +22,6 @@ const studentSchema = new Schema(
     school: {
       type: Schema.Types.ObjectId,
       ref: 'School',
-      required: true,
     },
     electives: [
       {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Students from '@models/students.model';
-import Schools from '@models/schools.model';
+// import Schools from '@models/schools.model';
 import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
 // import School from '@/interfaces/schools.interface';
@@ -28,18 +28,20 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
 
     // Creating Studnet
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    const student = await Students.create(body); // Adding student in db
+    await Students.create(body); // Adding student in db
 
-    // Add Student in School schema
-    const school = await Schools.findById(student.school); // Finding school by id
-    if (school) {
-      school.students.push(student._id); // Adding student in school schema
-      await school.save(); // Saving school schema
-      // // Done
-      return res.json({ success: true, student }); // Success
-    } else {
-      return res.status(409).json({ success: false, message: 'School does not exist' });
-    }
+    // if (student.school) {
+    //   // Add Student in School schema
+    //   const school = await Schools.findById(student.school); // Finding school by id
+    //   if (school) {
+    //     school.students.push(student._id); // Adding student in school schema
+    //     await school.save(); // Saving school schema
+    //   } else {
+    //     return res.status(409).json({ success: false, message: 'School does not exist' });
+    //   }
+    // }
+    // // Done
+    return res.json({ success: true, message: 'Student Created Successfully.' }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
