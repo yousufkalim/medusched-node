@@ -7,12 +7,10 @@ export default interface Elective {
   hospital: Hospital | string;
   schools: School[] | string[];
   students: Student[] | string[];
-  post_name: string;
-  email: string;
+  title: string;
   description: string;
-  locatoin: string;
-  MaxAttendees: number;
   start_date: Date;
   duration: string;
+  limit: boolean;
   active: boolean;
 }

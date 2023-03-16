@@ -8,11 +8,9 @@ import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
-  const body: Elective = req.body;
   const user = req.user as Hospital;
 
   try {
-    const { email } = body; // Getting required fields from body
     const { _id } = user;
     const hospital = await Hospitals.findById(_id);
 
@@ -22,19 +20,16 @@ export const createElectives = async (req: IRequest, res: Response): Promise<Res
         .status(409)
         .json({ success: false, message: 'Invalid Token or Hospital not exists' });
     }
-    const existingElective = await Electives.findOne({ email }); // Finding already existing elective
 
-    // Extra Validations
-    if (existingElective) {
-      // If we found existing user in db
-      return res.status(409).json({ success: false, message: 'Elective already exists.' });
-    }
-    // Creating Elective
-    const elective = new Electives({
-      ...req.body,
-      hospital: _id,
-    });
-    await elective.save();
+    // // Creating Elective
+    // const elective = new Electives({
+    //   ...req.body,
+    //   hospital: _id,
+    // });
+    // console.log('3');
+    // await elective.save();
+    const elective = await Electives.create({ ...req.body, hospital: _id }); // Adding New Elective in db
+    console.log('4');
     // Done
     return res.json({ success: true, elective }); // Success
   } catch (err) {

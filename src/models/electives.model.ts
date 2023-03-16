@@ -1,5 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
-import School from '@interfaces/schools.interface';
+import Elective from '@interfaces/electives.interface';
 
 // Admin Schema
 const electiveSchema = new Schema(
@@ -20,23 +20,14 @@ const electiveSchema = new Schema(
         ref: 'Student',
       },
     ],
-    post_name: {
+    title: {
       type: String,
       required: true,
     },
-    email: {
-      type: String,
-      unique: true,
-    },
+
     description: {
       type: String,
       required: true,
-    },
-    locatoin: {
-      type: String,
-    },
-    MaxAttendees: {
-      type: Number,
     },
     start_date: {
       type: Date,
@@ -44,7 +35,9 @@ const electiveSchema = new Schema(
     duration: {
       type: String,
     },
-
+    limit: {
+      type: Boolean,
+    },
     active: {
       type: Boolean,
       default: true,
@@ -56,4 +49,4 @@ const electiveSchema = new Schema(
 );
 
 // Model
-export default model<School & Document>('Elective', electiveSchema);
+export default model<Elective & Document>('Elective', electiveSchema);
