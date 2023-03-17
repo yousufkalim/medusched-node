@@ -55,7 +55,7 @@ export const updateHospital = async (req: IRequest, res: Response): Promise<Resp
     }
 
     const hospital = await Hospitals.findByIdAndUpdate(hospitalId, body, { new: true }); // Updating the Hospital user
-    return res.json({ success: true, hospital }); // Success
+    return res.json({ success: true, user: { ...hospital } }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -97,7 +97,7 @@ export const loginHospital = async (req: IRequest, res: Response): Promise<Respo
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
 
     // done
-    return res.json({ success: true, hospital, token });
+    return res.json({ success: true, user: { ...hospital }, token });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -121,7 +121,7 @@ export const getSingleHospital = async (req: IRequest, res: Response): Promise<R
   try {
     const hospitalId = req.params.hospitalId;
     const hospital = await Hospitals.findById(hospitalId).populate('schools'); // Finding all the users from db
-    return res.json({ success: true, hospital }); // Success
+    return res.json({ success: true, user: { ...hospital } }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
