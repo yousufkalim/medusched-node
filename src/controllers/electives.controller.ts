@@ -91,7 +91,12 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
   }
 };
 
-export const getAllElectives = async (req: IRequest, res: Response): Promise<Response> => {
+
+
+
+
+export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
+  // const user = req.user as Hospital;
   // const hospital = req.user as Hospital;
   try {
     // const { _id } = hospital;
