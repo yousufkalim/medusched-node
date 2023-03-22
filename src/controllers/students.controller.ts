@@ -116,7 +116,8 @@ export const getAllStudents = async (_req: Request, res: Response): Promise<Resp
  */
 export const getStudentById = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const studentId = req.params.studentId; // Getting student by id from URL parameter
+    const studentId = req.params.userId; // Getting student by id from URL parameter
+    console.log('std', studentId);
     const student = await Students.findById(studentId); // Finding studnet by id
     return res.json({ success: true, student }); // Success
   } catch (err) {
