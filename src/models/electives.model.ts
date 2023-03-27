@@ -35,9 +35,13 @@ const electiveSchema = new Schema(
     duration: {
       type: String,
     },
-    limit: {
+    limitenrollment: {
       type: Boolean,
     },
+    limit: {
+      type: Number,
+    },
+
     active: {
       type: Boolean,
       default: true,
