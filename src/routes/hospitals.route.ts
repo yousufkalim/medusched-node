@@ -6,13 +6,15 @@ import {
   updateHospital,
   deleteHospital,
   getSingleHospital,
+  getCounts,
 } from '@controllers/hospitals.controller';
-import { checkAdminAuth , checkUserAuth } from '@middleware/auth.middleware';
+import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 const router = Router();
 
 router.post('/', checkAdminAuth, registerHospital); // Create - Hospital Signup
 
 router.get('/', checkAdminAuth, getAllHospital); // Get all Hospital
+router.get('/countIs', checkAdminAuth, getCounts); // Get all Hospital
 router.get('/:hospitalId', checkAdminAuth, getSingleHospital); // Get single Hospital
 
 router.post('/login', loginHospital); // Hospital Login
