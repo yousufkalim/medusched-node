@@ -42,3 +42,25 @@ export const sendEmail = async (email: string, password: string): Promise<object
     });
   });
 };
+
+export const sendForgotEmail = async (email: string, token: string): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Password reset request',
+      text: `You have initiated the request to reset your password, please click on the link below to set your new password \n ${token}`,
+    };
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};

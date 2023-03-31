@@ -6,10 +6,12 @@ import { Request, Response } from 'express';
 import IRequest from '@interfaces/request.interface';
 import Auth, { ChangePassword } from '@interfaces/auth.interface';
 import Users from '@models/users.model';
+import Hospitals from '@models/hospitals.model';
+import Students from '@models/students.model';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { sendEmail } from '@utils/sendEmail';
-import { JWT_SECRET, BCRYPT_SALT } from '@config';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { sendForgotEmail } from '@utils/sendEmail';
+import { JWT_SECRET, BCRYPT_SALT, ORIGIN } from '@config';
 
 /**
  * Login
@@ -102,6 +104,16 @@ export const changePassword = async (req: Request, res: Response): Promise<Respo
 };
 
 /**
+ * Confirm auth
+ * @param {object} req
+ * @param {object} res
+ */
+export const confirmAuth = (req: IRequest, res: Response): Response => {
+  // If user authenticated
+  return res.json({ success: true, user: req.user });
+};
+
+/**
  * Forgot password
  * @param {object} req
  * @param {object} res
@@ -109,24 +121,34 @@ export const changePassword = async (req: Request, res: Response): Promise<Respo
 export const forgot = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { email } = req.params;
-    const user = await Users.findOne({ email });
+    console.log('email', req?.body?.role);
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    if (req.body.role === 'Hospital') {
+      const hospital = await Hospitals.findOne({ email });
+      if (!hospital) {
+        return res.status(404).json({ success: false, message: 'Hospital not found' });
+      }
+      // Generating token
+      const token = jwt.sign({ user: hospital }, JWT_SECRET, { expiresIn: '15m' });
+      // Sending email to hospital
+      await sendForgotEmail(email, `${ORIGIN}/reset/${token}`);
+      // Done
+      return res.json({ success: true, message: 'Email sent successfully' });
+    } else {
+      const student = await Students.findOne({ email });
+      if (!student) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+      // Generating token
+      const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
+      console.log('student email');
+
+      // Sending email to hospital
+      await sendForgotEmail(email, `${ORIGIN}/reset/${token}`);
+
+      // Done
+      return res.json({ success: true, message: 'Email 2 sent successfully' });
     }
-
-    // Generating random password
-    const randomPassword = Math.random().toString(36).slice(-8);
-
-    // Sending email to user
-    await sendEmail(email, randomPassword);
-
-    // If email is sent then we have to update the password in db
-    user.password = await bcrypt.hash(randomPassword, BCRYPT_SALT);
-    await user.save();
-
-    // Done
-    return res.json({ success: true, message: 'Email sent successfully' });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -135,12 +157,65 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
   }
 };
 
-/**
- * Confirm auth
- * @param {object} req
- * @param {object} res
- */
-export const confirmAuth = (req: IRequest, res: Response): Response => {
-  // If user authenticated
-  return res.json({ success: true, user: req.user });
+export const verifyToken = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    console.log(decoded, 'decoded');
+    if (decoded?.user?.role === 'Hospital') {
+      const hospital = await Hospitals.findById(decoded?.user?._id);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Token verified successfully',
+        userId: hospital?._id,
+      });
+    } else if (decoded?.user?.role === 'student') {
+      const student = await Students.findById(decoded?.user?._id);
+
+      console.log('user', student);
+      return res.status(200).json({
+        success: true,
+        message: 'Token verified successfully',
+        userId: student?._id,
+      });
+    } else {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const resetPassword = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const hospital = await Hospitals.findById(decoded.user._id);
+    const student = await Students.findById(decoded.user._id);
+    if (student) {
+      student.password = bcrypt.hashSync(req.body.password, 10);
+      student.active = true;
+      await student.save();
+      return res
+        .status(200)
+        .json({ success: true, message: 'Password updated successfully', role: student.role });
+    } else if (hospital) {
+      hospital.password = bcrypt.hashSync(req.body.password, 10);
+      hospital.active = true;
+      await hospital.save();
+      return res
+        .status(200)
+        .json({ success: true, message: 'Password updated successfully', role: hospital.role });
+    } else {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };

@@ -99,8 +99,8 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
  */
 export const getAllStudents = async (_req: Request, res: Response): Promise<Response> => {
   try {
-    const students = await Students.find(); // Finding all the users from db
-    return res.json({ success: true, students }); // Success
+    const users = await Students.find(); // Finding all the users from db
+    return res.json({ success: true, users }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

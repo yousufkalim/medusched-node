@@ -11,6 +11,7 @@ export default interface Elective {
   description: string;
   start_date: Date;
   duration: string;
-  limit: boolean;
+  limitenrollment: boolean;
+  limit: number;
   active: boolean;
 }

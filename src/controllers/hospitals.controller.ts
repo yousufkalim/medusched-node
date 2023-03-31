@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Admins from '@models/admins.model';
 import Hospitals from '@models/hospitals.model';
+import Students from '@models/students.model';
+import Schools from '@models/schools.model';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import IRequest from '@interfaces/request.interface';
@@ -141,6 +143,20 @@ export const deleteHospital = async (req: Request, res: Response): Promise<Respo
       { new: true },
     ); // Deleting the hospital
     return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const getCounts = async (_req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const hospitalsCount = await Hospitals.find().countDocuments(); // Finding all the users from db
+    const studentsCount = await Students.find().countDocuments(); // Finding all the users from db
+    const schoolsCount = await Schools.find().countDocuments(); // Finding all the users from db
+    return res.json({ success: true, count: { hospitalsCount, studentsCount, schoolsCount } }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
