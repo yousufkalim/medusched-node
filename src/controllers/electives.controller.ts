@@ -30,6 +30,13 @@ export const createElectives = async (req: IRequest, res: Response): Promise<Res
     // await elective.save();
     const elective = await Electives.create({ ...req.body, hospital: _id }); // Adding New Elective in db
     console.log('4');
+    await Hospitals.findByIdAndUpdate(
+      _id,
+      { $push: { electives: elective._id } },
+      {
+        new: true,
+      },
+    ); // update architect to push bookLibrary
     // Done
     return res.json({ success: true, elective }); // Success
   } catch (err) {
@@ -70,6 +77,7 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
         .json({ success: false, message: 'Invalid electiveId Id or elective not exists' });
     }
     await Students.findByIdAndUpdate(studentId, { phone, name }, { new: true }); // Updating the student data
+    // send email
     const a = await Students.findByIdAndUpdate(
       studentId,
       { $push: { electives: electiveId } },
@@ -91,15 +99,33 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
   }
 };
 
-
-
-
-
-export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
-  // const user = req.user as Hospital;
-  // const hospital = req.user as Hospital;
+export const getAllElectivesOfHospital = async (
+  _req: IRequest,
+  res: Response,
+): Promise<Response> => {
+  const hospital = _req.user as Hospital;
   try {
-    // const { _id } = hospital;
+    const { _id } = hospital;
+    const electives = await Electives.find({
+      hospital: _id,
+    }); // Finding all the Electives from db
+
+    // Here we can fing electives of specific hospital or all electives related to specific hospital.
+
+    // const { _id } = user;
+    // const electives = await Electives.find({
+    //   hospital: _id,
+    // }); // Finding electives of specific hospital
+    return res.json({ success: true, electives }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
+  try {
     const electives = await Electives.find({}); // Finding all the Electives from db
 
     // Here we can fing electives of specific hospital or all electives related to specific hospital.
