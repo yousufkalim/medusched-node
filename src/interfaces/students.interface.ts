@@ -6,7 +6,7 @@ export default interface Student {
   email: string;
   password: string;
   school: School | string;
-  electives: Elective[] | string[];
+  electives: Elective[] | [];
   role: 'student';
   address?: string;
   phone?: string;

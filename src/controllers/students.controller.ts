@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Students from '@models/students.model';
-// import Schools from '@models/schools.model';
+import Schools from '@models/schools.model';
 import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
 // import School from '@/interfaces/schools.interface';
@@ -17,7 +17,7 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
   const body: Student = req.body;
 
   try {
-    const { email, password } = body; // Getting required fields from body
+    const { email, password, school } = body; // Getting required fields from body
     const existingStudnet = await Students.findOne({ email }); // Finding already existing student
 
     // Extra Validations
@@ -28,18 +28,17 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
 
     // Creating Studnet
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    await Students.create(body); // Adding student in db
+    const student = await Students.create(body); // Adding student in db
 
-    // if (student.school) {
-    //   // Add Student in School schema
-    //   const school = await Schools.findById(student.school); // Finding school by id
-    //   if (school) {
-    //     school.students.push(student._id); // Adding student in school schema
-    //     await school.save(); // Saving school schema
-    //   } else {
-    //     return res.status(409).json({ success: false, message: 'School does not exist' });
-    //   }
-    // }
+    // Add Student in School schema
+    const getSchool = await Schools.findById(school); // Finding school by id
+    if (getSchool) {
+      getSchool.students.push(student._id); // Adding student in school schema
+      await getSchool.save(); // Saving school schema
+    } else {
+      return res.status(409).json({ success: false, message: 'School does not exist' });
+    }
+
     // // Done
     return res.json({ success: true, message: 'Student Created Successfully.' }); // Success
   } catch (err) {
