@@ -65,7 +65,8 @@ export const sendForgotEmail = async (email: string, token: string): Promise<obj
   });
 };
 export const sendCSVEmail = async (
-  name: string,,
+  name: string,
+  _email: string,
   attachment: string,
 ): Promise<object> => {
   return await new Promise((resolve, reject) => {
