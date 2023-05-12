@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  test:
     runs-on: self-hosted
 
     steps:
@@ -31,4 +31,4 @@ jobs:
       # The fourth step creates a build.
       - name: Build project
         run: |
-          CI= yarn run build
+          CI= yarn run start
