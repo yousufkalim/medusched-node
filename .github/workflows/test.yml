@@ -29,11 +29,6 @@ jobs:
           yarn install
           cp .env.example .env || :
 
-      # The fourth step creates a build.
-      - name: Create build
-        run: |
-          CI= yarn run build --if-present
-
       # The fifth step runs the project.
       - name: Run the app
         run: |
