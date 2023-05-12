@@ -32,4 +32,4 @@ jobs:
       # The fifth step runs the project.
       - name: Run the app
         run: |
-          timeout 5s yarn run start
+          timeout --preserve-status 5s yarn run start
