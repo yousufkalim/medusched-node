@@ -27,8 +27,14 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
+          cp .env.example .env || :
 
       # The fourth step creates a build.
-      - name: Build project
+      - name: Create build
         run: |
-          CI= yarn run start
+          CI= yarn run build --if-present
+
+      # The fifth step runs the project.
+      - name: Run the app
+        run: |
+          timeout 5s node dist/index.js
