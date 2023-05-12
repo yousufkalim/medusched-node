@@ -32,4 +32,4 @@ jobs:
       # The fifth step runs the project.
       - name: Run the app
         run: |
-          timeout 5s node dist/index.js
+          timeout 5s yarn run start
