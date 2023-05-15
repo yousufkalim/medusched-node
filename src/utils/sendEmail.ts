@@ -64,6 +64,7 @@ export const sendForgotEmail = async (email: string, token: string): Promise<obj
     });
   });
 };
+
 export const sendCSVEmail = async (
   name: string,
   email: string,
@@ -83,6 +84,28 @@ export const sendCSVEmail = async (
           path: `${attachment}`, // stream this file
         },
       ],
+    };
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};
+
+export const sendEvaluationEmail = async (email: string): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Evaluation',
+      text: `Evaluation email`,
     };
     // Sending email
     transporter.sendMail(mailOptions, function (error) {

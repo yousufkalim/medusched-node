@@ -157,6 +157,27 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
   }
 };
 
+/**
+ * Forgot password
+ * @param {object} req
+ * @param {object} res
+ */
+export const evaluationemail = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { email } = req.body;
+    console.log('email', email);
+    // Sending email to hospital
+    // await sendEvaluationEmail(email);
+    // Done
+    return res.json({ success: true, message: 'Email sent successfully' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 export const verifyToken = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { token } = req.params;
