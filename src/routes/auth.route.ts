@@ -8,6 +8,7 @@ import {
   confirmAuth,
   changePassword,
   forgot,
+  evaluationemail,
   verifyToken,
   resetPassword,
 } from '@controllers/auth.controller';
@@ -28,6 +29,7 @@ router.post('/login', validateLogin, isValidated, login); // Get all users at on
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
 router.put('/password/:userId', checkUserAuth, changePassword); // Change password route
 router.put('/forgot/:email', forgot); // Forgot  password
+router.post('/evaluationemail', evaluationemail); // evaluationmail
 router.get('/verifyToken/:token', verifyToken); // VerifyToken
 router.put('/reset/:token', resetPassword); // ResetPassword password
 

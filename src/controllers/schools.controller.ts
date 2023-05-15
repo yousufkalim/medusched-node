@@ -114,17 +114,19 @@ export const sendCSVToSchool = async (req: IRequest, res: Response): Promise<Res
       },
     }); // Updating the School
 
-    if (school?.students?.length >= 1) {
-      const csvPath = generateCSV(school?.students as Student[]);
-      await sendCSVEmail(school?.name, school?.email, csvPath);
-      return res.json({ success: true }); // Success
+    if (school?.students) {
+      console.log(school.students);
+      if (school?.students.length >= 1) {
+        const csvPath = generateCSV(school?.students as Student[]);
+        await sendCSVEmail(school?.name, school?.email, csvPath);
+        return res.json({ success: true }); // Success
+      } else {
+        return res.status(409).json({ success: false, message: 'School has no students yet' });
+      }
     } else {
       return res.status(409).json({ success: false, message: 'School has no students yet' });
     }
   } catch (err) {
-    // Error handling
-    // eslint-disable-next-line no-console
-    console.log('Error ----> ', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

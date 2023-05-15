@@ -3,8 +3,9 @@ import {
   createElectives,
   getAllElectives,
   getAllElectivesOfHospital,
-  getAllElectivesByHospital,
   getSingleElective,
+  getAllAffiliatedElectives,
+  getAllElectivesByHospital,
   applyElective,
   updateElective,
   deleteElective,
@@ -16,8 +17,9 @@ router.post('/', checkUserAuth, createElectives); // Create Elective
 router.put('/applyelective', checkUserAuth, applyElective); // Create Elective
 
 router.get('/', checkUserAuth, getAllElectivesOfHospital); // get all Elective of a hospital
-router.get('/all', checkUserAuth, getAllElectives); // get all Elective
-router.get('/hospital/:hospitalId', checkUserAuth, getAllElectivesByHospital); // get all Electives by hospital
+router.get('/all', checkUserAuth, getAllElectives); // get all  Electives
+router.get('/all/affiliated', checkUserAuth, getAllAffiliatedElectives); // get all affiliated Electives
+router.get('/hospital/:hospitalId', checkUserAuth, getAllElectivesByHospital);
 router.get('/:electiveId', checkUserAuth, getSingleElective); // get Single Elective
 
 router.put('/:electiveId', checkUserAuth, updateElective); // Update Elective
