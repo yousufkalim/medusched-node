@@ -124,17 +124,41 @@ export const getAllElectivesOfHospital = async (
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
-export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
+export const getAllElectives = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const electives = await Electives.find({}); // Finding all the Electives from db
-
-    // Here we can fing electives of specific hospital or all electives related to specific hospital.
-
-    // const { _id } = user;
-    // const electives = await Electives.find({
-    //   hospital: _id,
-    // }); // Finding electives of specific hospital
     return res.json({ success: true, electives }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const getAllAffiliatedElectives = async (
+  req: IRequest,
+  res: Response,
+): Promise<Response> => {
+  try {
+    // get all affiliated Electives with student's school
+    const user = req.user as Hospital;
+    const { _id } = user;
+    const student = await Students.findById(_id);
+    if (!student) {
+      return res.status(409).json({ success: false, message: 'Student not Found' });
+    }
+    // find affiliated hospital with student's school id
+    const affiliatedHospitals = await Hospitals.find(
+      { schools: { $in: [student?.school] } },
+      { _id: 1 },
+    );
+    // Extract the hospital IDs from the hospitalIds array
+    const ids = affiliatedHospitals.map((idObj) => idObj._id);
+    // now find electives with affiliated hospitals
+    const affiliatedElectives = await Electives.find({ hospital: { $in: ids } });
+    console.log('affiliatedElectives', affiliatedElectives);
+    return res.json({ success: true, electives: affiliatedElectives }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
