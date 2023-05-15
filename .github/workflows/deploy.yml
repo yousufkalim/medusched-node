@@ -28,7 +28,7 @@
 # Overall, this workflow provides a good starting point for deploying a Node.js backend application to a remote server using GitHub Actions.
 # However, it should be customized according to your application's specific requirements.
 
-name: 'CI/CD'
+name: 'CD'
 
 env:
   APP_NAME: ${{ vars.APP_NAME }}
@@ -119,8 +119,8 @@ jobs:
           script: |
             cd ${{ env.RELEASE_PATH }}/build
             yarn install
-            yarn run build --if-present
-            
+            yarn run build
+
       # The seventh step starts it with PM2.
       # PM2 is a process manager for Node.js applications that helps to ensure that the application runs continuously
       # and can be easily managed. Ensure that this is set correctly according to your application's dependencies and build process.
