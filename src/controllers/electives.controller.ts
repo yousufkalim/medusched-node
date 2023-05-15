@@ -124,7 +124,7 @@ export const getAllElectivesOfHospital = async (
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
-export const getAllElectives = async (req: IRequest, res: Response): Promise<Response> => {
+export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
     const electives = await Electives.find({}); // Finding all the Electives from db
     return res.json({ success: true, electives }); // Success
