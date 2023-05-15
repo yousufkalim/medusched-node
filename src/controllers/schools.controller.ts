@@ -123,11 +123,10 @@ export const sendCSVToSchool = async (req: IRequest, res: Response): Promise<Res
       } else {
         return res.status(409).json({ success: false, message: 'School has no students yet' });
       }
+    } else {
+      return res.status(409).json({ success: false, message: 'School has no students yet' });
     }
   } catch (err) {
-    // Error handling
-    // eslint-disable-next-line no-console
-    console.log('Error ----> ', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
