@@ -119,3 +119,24 @@ export const sendEvaluationEmail = async (email: string): Promise<object> => {
     });
   });
 };
+export const sendApplyConfirmationEmail = async (email: string): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Confirmation',
+      text: `You have applied successfully`,
+    };
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};

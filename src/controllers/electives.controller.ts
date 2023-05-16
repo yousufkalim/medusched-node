@@ -6,6 +6,7 @@ import Students from '@models/students.model';
 import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
+// import { sendApplyConfirmationEmail } from '@utils/sendEmail';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
   const user = req.user as Hospital;
@@ -77,19 +78,23 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
         .json({ success: false, message: 'Invalid electiveId Id or elective not exists' });
     }
     await Students.findByIdAndUpdate(studentId, { phone, name }, { new: true }); // Updating the student data
-    // send email
+
     const a = await Students.findByIdAndUpdate(
       studentId,
       { $push: { electives: electiveId } },
       { new: true },
     );
-    console.log('a is', a);
+    console.log('a', a);
 
     await Electives.findByIdAndUpdate(
       electiveId,
       { $push: { students: studentId } },
       { new: true },
     ); // Updating the elective
+    // console.log('a is', a);
+
+    //  student should receive email to applied electives
+    // await sendApplyConfirmationEmail(email);
     return res.json({ success: true, message: 'Applied successfully' }); // Success
   } catch (err) {
     // Error handling
