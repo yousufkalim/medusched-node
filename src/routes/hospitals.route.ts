@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import {upload} from "../middleware/multer.middleware";
 import {
   registerHospital,
   getAllHospital,
@@ -11,7 +12,9 @@ import {
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 const router = Router();
 
-router.post('/', checkAdminAuth, registerHospital); // Create - Hospital Signup
+
+
+router.post('/', checkAdminAuth,upload.single("image"), registerHospital); // Create - Hospital Signup
 
 router.get('/', checkAdminAuth, getAllHospital); // Get all Hospital
 router.get('/countIs', checkAdminAuth, getCounts); // Get all Hospital
