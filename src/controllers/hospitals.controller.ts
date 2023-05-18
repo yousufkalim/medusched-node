@@ -11,7 +11,10 @@ import Admin from '@interfaces/admins.interface';
 import { JWT_SECRET, BCRYPT_SALT } from '@config';
 import Auth from '@interfaces/auth.interface';
 
+
 export const registerHospital = async (req: IRequest, res: Response): Promise<Response> => {
+  console.log("aaaaa",req.body)
+  console.log("aaaaa2",req?.file?.path)
   const body: Hospital = req.body;
   const user = req.user as Admin;
 
@@ -35,7 +38,7 @@ export const registerHospital = async (req: IRequest, res: Response): Promise<Re
     // // Creating Hospital
 
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    const hospital = await Hospitals.create({ ...body, admin: _id }); // Adding New Hospital in db
+    const hospital = await Hospitals.create({ ...body, admin: _id,logo:req?.file?.path, schools: body?.schools }); // Adding New Hospital in db
     // Done
     return res.json({ success: true, hospital }); // Success
   } catch (err) {

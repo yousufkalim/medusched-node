@@ -12,6 +12,9 @@ const hospitalSchema = new Schema(
       type: String,
       unique: true,
     },
+    logo: {
+      type: String,
+    },
     admin: {
       type: Schema.Types.ObjectId,
       ref: 'Admin',
