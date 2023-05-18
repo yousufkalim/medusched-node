@@ -64,6 +64,27 @@ export const sendForgotEmail = async (email: string, token: string): Promise<obj
     });
   });
 };
+export const verifyStudent = async (email: string, token: string): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Student Verification Request',
+      text: `Please Click the link to verify Your Email \n ${token}`,
+    };
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};
 
 export const sendCSVEmail = async (
   name: string,
@@ -98,14 +119,24 @@ export const sendCSVEmail = async (
   });
 };
 
-export const sendEvaluationEmail = async (email: string): Promise<object> => {
+export const sendEvaluationEmail = async (email: string, attachment: string): Promise<object> => {
   return await new Promise((resolve, reject) => {
+    console.log('email111', email);
     // Send email options
     const mailOptions = {
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
-      subject: 'Evaluation',
-      text: `Evaluation email`,
+      subject: 'Clinical Evaluation',
+      text: ` Attached is the clinical evaluation for the SGU medical student that has/is completing your elective this month. Please complete, sign and return it to the Department of Medicine Student Coordinator, Christina Oquendo, via:
+- email: Christina.Oquendo@rwjbh.org
+OR
+- directly to her office: 1E Department of Medicine`,
+      attachments: [
+        {
+          filename: 'Clinical_Evaluation.pdf',
+          path: attachment,
+        },
+      ],
     };
     // Sending email
     transporter.sendMail(mailOptions, function (error) {

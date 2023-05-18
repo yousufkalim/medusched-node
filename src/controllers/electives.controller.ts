@@ -162,7 +162,6 @@ export const getAllAffiliatedElectives = async (
     const ids = affiliatedHospitals.map((idObj) => idObj._id);
     // now find electives with affiliated hospitals
     const affiliatedElectives = await Electives.find({ hospital: { $in: ids } });
-    console.log('affiliatedElectives', affiliatedElectives);
     return res.json({ success: true, electives: affiliatedElectives }); // Success
   } catch (err) {
     // Error handling

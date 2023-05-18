@@ -6,6 +6,7 @@ import {
   getAllStudents,
   getStudentById,
   deleteStudent,
+  VerifyStudent,
 } from '@controllers/students.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
 const router = Router();
@@ -33,6 +34,8 @@ router.put('/:userId', checkUserAuth, updateStudent); // Update a specific stude
 
 // Delete
 router.delete('/:userId', checkUserAuth, deleteStudent); // delete a specific student by it's id
+
+router.put('/verifystudent/:token', VerifyStudent); // Verify Student
 
 // Export
 export default router;
