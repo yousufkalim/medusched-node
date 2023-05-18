@@ -5,8 +5,9 @@ import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
 // import School from '@/interfaces/schools.interface';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { BCRYPT_SALT, JWT_SECRET } from '@config';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
+import { verifyStudent } from '@/utils/sendEmail';
 
 /**
  * Create User - Signup
@@ -34,13 +35,15 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
     const getSchool = await Schools.findById(school); // Finding school by id
     if (getSchool) {
       getSchool.students.push(student._id); // Adding student in school schema
-      await getSchool.save(); // Saving school schema
+      // await getSchool.save(); // Saving school schema
     } else {
       return res.status(409).json({ success: false, message: 'School does not exist' });
     }
+    const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
+    await verifyStudent(email, `${ORIGIN}/verify/${token}`);
 
     // // Done
-    return res.json({ success: true, message: 'Student Created Successfully.' }); // Success
+    return res.json({ success: true, message: 'Student Created Successfully.Please Verify' }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -64,7 +67,7 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
       return res.status(404).json({ success: false, message: 'student not found' });
     } else if (!student.active) {
       // If student not found or not active
-      return res.status(400).json({ success: false, message: 'Your account is not activated' });
+      return res.status(400).json({ success: false, message: 'Please Verify Your Email First' });
     }
 
     // Comparing password
@@ -163,6 +166,28 @@ export const deleteStudent = async (req: Request, res: Response): Promise<Respon
     const studentId = req.params.studentId; // Getting student id from URL parameter
     const user = await Students.findByIdAndUpdate(studentId, { active: false }, { new: true }); // Deleting the student
     return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const VerifyStudent = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    console.log('student112');
+    const { token } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const student = await Students.findById(decoded.user._id);
+    console.log('student11', student);
+    if (student) {
+      student.active = true;
+      await student.save();
+      return res.status(200).json({ success: true, message: 'Student Verify Successfully' });
+    } else {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

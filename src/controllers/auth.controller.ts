@@ -12,6 +12,8 @@ import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendForgotEmail } from '@utils/sendEmail';
 import { JWT_SECRET, BCRYPT_SALT, ORIGIN } from '@config';
+import { sendEvaluationEmail } from '../utils/sendEmail';
+import path from 'path';
 
 /**
  * Login
@@ -167,7 +169,10 @@ export const evaluationemail = async (req: Request, res: Response): Promise<Resp
     const { email } = req.body;
     console.log('email', email);
     // Sending email to hospital
-    // await sendEvaluationEmail(email);
+    // attachment path
+    const attachmentPath = path.join(__dirname, '..', '..', 'uploads', `assementmedusched.pdf`);
+
+    await sendEvaluationEmail(email, attachmentPath);
     // Done
     return res.json({ success: true, message: 'Email sent successfully' });
   } catch (err) {
