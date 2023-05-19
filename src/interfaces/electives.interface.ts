@@ -14,4 +14,7 @@ export default interface Elective {
   limitenrollment: boolean;
   limit: number;
   active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
 }
