@@ -11,7 +11,7 @@ import { NODE_ENV } from '@config';
 export default function middleware(app: Application): void {
   app.use(
     cors({
-      origin: NODE_ENV === 'prod' ? process.env.ORIGIN : true,
+      origin: NODE_ENV === 'prod' ? [process.env.ORIGIN, process.env.ADMIN] : true,
       credentials: true,
     }),
   ); // CORS (Cross Origin Policy) to restrict unknown requests
