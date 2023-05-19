@@ -8,11 +8,10 @@ export default interface Hospital {
   email: string;
   admin: Admin | string;
   electives: Elective[] | string[];
-  schools: School[] | string[] | string;
+  schools: School[] | string[];
   address: string;
   password: string;
   role: 'Hospital';
   active: boolean;
   logo: string;
 }
-

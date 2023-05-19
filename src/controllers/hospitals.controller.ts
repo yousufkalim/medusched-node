@@ -11,10 +11,9 @@ import Admin from '@interfaces/admins.interface';
 import { JWT_SECRET, BCRYPT_SALT } from '@config';
 import Auth from '@interfaces/auth.interface';
 
-
 export const registerHospital = async (req: IRequest, res: Response): Promise<Response> => {
-  console.log("aaaaa",req.body)
-  console.log("aaaaa2",req?.file?.path)
+  console.log('aaaaa', req.body);
+  console.log('aaaaa2', req?.file?.path);
   const body: Hospital = req.body;
   const user = req.user as Admin;
 
@@ -38,7 +37,12 @@ export const registerHospital = async (req: IRequest, res: Response): Promise<Re
     // // Creating Hospital
 
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    const hospital = await Hospitals.create({ ...body, admin: _id,logo:req?.file?.path, schools: body?.schools }); // Adding New Hospital in db
+    const hospital = await Hospitals.create({
+      ...body,
+      admin: _id,
+      logo: req?.file?.path,
+      schools: body?.schools,
+    }); // Adding New Hospital in db
     // Done
     return res.json({ success: true, hospital }); // Success
   } catch (err) {
@@ -53,13 +57,22 @@ export const updateHospital = async (req: IRequest, res: Response): Promise<Resp
 
   try {
     const hospitalId = req.params.hospitalId; // Getting hospitalId from URL parameter
+    console.log('hospitalId', hospitalId);
 
     // If Hospital user want to update it's password
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
     }
+    if (req.file) {
+      req.body.logo = req.file.path;
+    }
+    console.log('body', body);
 
-    const hospital = await Hospitals.findByIdAndUpdate(hospitalId, body, { new: true }); // Updating the Hospital user
+    const hospital = await Hospitals.findByIdAndUpdate(
+      hospitalId,
+      { ...body, schools: body?.schools },
+      { new: true },
+    ); // Updating the Hospital user
     return res.json({ success: true, user: { ...hospital } }); // Success
   } catch (err) {
     // Error handling
