@@ -126,6 +126,41 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
   }
 };
 
+export const RemoveStudentFromElective = async (
+  req: IRequest,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const studentId = req.params.studentid; // Getting Elective id from URL parameter
+    const electiveId = req.body.electiveID;
+    console.log('studentid', studentId);
+    console.log('electiveId', electiveId);
+    // remove from Student array of elective
+    await Students.findByIdAndUpdate(
+      studentId,
+      { $pull: { electives: electiveId } },
+      {
+        new: true,
+      },
+    ); // Updating the Students
+    // remove from Elective array of student
+    await Electives.findByIdAndUpdate(
+      electiveId,
+      { $pull: { students: studentId } },
+      {
+        new: true,
+      },
+    ); // Updating the Elective
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 export const getAllElectivesOfHospital = async (
   _req: IRequest,
   res: Response,

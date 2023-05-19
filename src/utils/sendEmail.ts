@@ -96,7 +96,7 @@ export const sendCSVEmail = async (
     const mailOptions = {
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       // to: email,
-      to: 'asfi.official@gmail.com',
+      to: 'falconitconsultingpak@gmail.com',
       subject: `CSV for School ${name}`,
       text: `Attached herewith is the CSV file containing the information of students and their respective electives.`,
       attachments: [
