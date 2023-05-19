@@ -5,13 +5,13 @@
 import express, { Application } from 'express';
 import logger from 'morgan';
 import cors from 'cors';
-import { NODE_ENV } from '@config';
+import { NODE_ENV, ORIGIN, ADMIN } from '@config';
 
 // Common Middleware
 export default function middleware(app: Application): void {
   app.use(
     cors({
-      origin: NODE_ENV === 'prod' ? [process.env.ORIGIN, process.env.ADMIN] : true,
+      origin: NODE_ENV === 'prod' ? [ ORIGIN, ADMIN ] : true,
       credentials: true,
     }),
   ); // CORS (Cross Origin Policy) to restrict unknown requests
