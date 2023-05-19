@@ -7,6 +7,7 @@ import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
 // import { sendApplyConfirmationEmail } from '@utils/sendEmail';
+import { checkElectiveConflict } from '@utils/checkElectiveConflicts';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
   const user = req.user as Hospital;
@@ -17,9 +18,10 @@ export const createElectives = async (req: IRequest, res: Response): Promise<Res
 
     if (!hospital) {
       // If we not found existing Hospital in db
-      return res
-        .status(409)
-        .json({ success: false, message: 'Invalid Token or Hospital not exists' });
+      return res.status(409).json({
+        success: false,
+        message: 'Invalid Token or Hospital not exists',
+      });
     }
 
     // // Creating Elective
@@ -27,10 +29,8 @@ export const createElectives = async (req: IRequest, res: Response): Promise<Res
     //   ...req.body,
     //   hospital: _id,
     // });
-    // console.log('3');
     // await elective.save();
     const elective = await Electives.create({ ...req.body, hospital: _id }); // Adding New Elective in db
-    console.log('4');
     await Hospitals.findByIdAndUpdate(
       _id,
       { $push: { electives: elective._id } },
@@ -53,7 +53,9 @@ export const updateElective = async (req: IRequest, res: Response): Promise<Resp
   try {
     const electiveId = req.params.electiveId; // Getting electiveId id from URL parameter
 
-    const elective = await Electives.findByIdAndUpdate(electiveId, body, { new: true }); // Updating the elective
+    const elective = await Electives.findByIdAndUpdate(electiveId, body, {
+      new: true,
+    }); // Updating the elective
     return res.json({ success: true, elective }); // Success
   } catch (err) {
     // Error handling
@@ -65,17 +67,36 @@ export const updateElective = async (req: IRequest, res: Response): Promise<Resp
 export const applyElective = async (req: IRequest, res: Response): Promise<Response> => {
   const body: ApplyElective = req.body;
   try {
-    const { studentId, electiveId, phone, name } = body;
+    const { studentId, electiveId, name, phone } = body;
     console.log(studentId, electiveId, name);
     if (!studentId) {
-      return res
-        .status(409)
-        .json({ success: false, message: 'Invalid Student Id or Student not exists' });
+      return res.status(409).json({
+        success: false,
+        message: 'Invalid Student Id or Student not exists',
+      });
     }
     if (!electiveId) {
-      return res
-        .status(409)
-        .json({ success: false, message: 'Invalid electiveId Id or elective not exists' });
+      return res.status(409).json({
+        success: false,
+        message: 'Invalid electiveId Id or elective not exists',
+      });
+    }
+    const getstudentAppliedElectives = await Students.findById(studentId).populate('electives');
+    const getElective = await Electives.findById(electiveId);
+    if (!getElective) {
+      return res.status(409).json({ success: false, message: 'No Elective Found' });
+    }
+
+    const conflict = checkElectiveConflict(
+      getstudentAppliedElectives?.electives ? getstudentAppliedElectives?.electives : [],
+      getElective,
+    );
+    console.log('conflict', conflict);
+    if (conflict) {
+      return res.status(409).json({
+        success: false,
+        message: ' Your date is overlapping with another Applied Elective',
+      });
     }
     await Students.findByIdAndUpdate(studentId, { phone, name }, { new: true }); // Updating the student data
 
@@ -84,14 +105,15 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
       { $push: { electives: electiveId } },
       { new: true },
     );
-    console.log('a', a);
 
     await Electives.findByIdAndUpdate(
       electiveId,
       { $push: { students: studentId } },
       { new: true },
-    ); // Updating the elective
-    // console.log('a is', a);
+    );
+
+    // Updating the elective
+    console.log('a is', a);
 
     //  student should receive email to applied electives
     // await sendApplyConfirmationEmail(email);
@@ -161,7 +183,9 @@ export const getAllAffiliatedElectives = async (
     // Extract the hospital IDs from the hospitalIds array
     const ids = affiliatedHospitals.map((idObj) => idObj._id);
     // now find electives with affiliated hospitals
-    const affiliatedElectives = await Electives.find({ hospital: { $in: ids } });
+    const affiliatedElectives = await Electives.find({
+      hospital: { $in: ids },
+    });
     return res.json({ success: true, electives: affiliatedElectives }); // Success
   } catch (err) {
     // Error handling
