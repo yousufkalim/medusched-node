@@ -115,7 +115,7 @@ export const sendCSVToSchool = async (req: IRequest, res: Response): Promise<Res
     }); // Updating the School
 
     if (school?.students) {
-      console.log(school.students);
+      console.log('aaaa', school.students);
       if (school?.students.length >= 1) {
         const csvPath = generateCSV(school?.students as Student[]);
         await sendCSVEmail(school?.name, school?.email, csvPath);

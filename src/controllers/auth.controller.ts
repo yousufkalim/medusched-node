@@ -8,12 +8,14 @@ import Auth, { ChangePassword } from '@interfaces/auth.interface';
 import Users from '@models/users.model';
 import Hospitals from '@models/hospitals.model';
 import Students from '@models/students.model';
+import Electives from '@models/electives.model';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendForgotEmail } from '@utils/sendEmail';
 import { JWT_SECRET, BCRYPT_SALT, ORIGIN } from '@config';
 import { sendEvaluationEmail } from '../utils/sendEmail';
 import path from 'path';
+import moment from 'moment';
 
 /**
  * Login
@@ -164,15 +166,40 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
  * @param {object} req
  * @param {object} res
  */
-export const evaluationemail = async (req: Request, res: Response): Promise<Response> => {
+export const evaluationemail = async (req: IRequest, res: Response): Promise<Response> => {
   try {
-    const { email } = req.body;
-    console.log('email', email);
+    const { email, id, electiveId } = req.body;
+    const student = await Students.findById(id);
+    if (!student) {
+      return res.status(409).json({
+        success: false,
+        message: 'Student Not Found',
+      });
+    }
+    const elective = await Electives.findById(electiveId);
+    if (!elective) {
+      return res.status(409).json({
+        success: false,
+        message: 'Elective Not Found',
+      });
+    }
+
     // Sending email to hospital
     // attachment path
-    const attachmentPath = path.join(__dirname, '..', '..', 'uploads', `assementmedusched.pdf`);
+    const attachmentPath = path.join(__dirname, '..', 'utils', `assementmedusched.pdf`);
+    const studentName = student?.name;
+    const ElectiveName = elective?.title;
+    const startDate = moment(elective?.start_date).format('MM-DD-YYYY');
+    const duration = elective?.duration;
 
-    await sendEvaluationEmail(email, attachmentPath);
+    await sendEvaluationEmail(
+      email,
+      attachmentPath,
+      studentName,
+      ElectiveName,
+      startDate,
+      duration,
+    );
     // Done
     return res.json({ success: true, message: 'Email sent successfully' });
   } catch (err) {
