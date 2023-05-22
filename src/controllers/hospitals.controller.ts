@@ -149,10 +149,10 @@ export const getSingleHospital = async (req: IRequest, res: Response): Promise<R
 };
 export const deleteHospital = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const hopitalId = req.params.hopitalId; // Getting hospital id from URL parameter
-    console.log('hopitalId', hopitalId);
+    const hospitalId = req.params.hospitalId; // Getting hospital id from URL parameter
+    console.log('hospitalId', hospitalId);
     await Hospitals.findByIdAndUpdate(
-      hopitalId,
+      hospitalId,
       {
         active: false,
       },
@@ -169,9 +169,10 @@ export const deleteHospital = async (req: Request, res: Response): Promise<Respo
 
 export const getCounts = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const hospitalsCount = await Hospitals.find().countDocuments(); // Finding all the users from db
+    const hospitalsCount = await Hospitals.find({ active: true }).countDocuments(); // Finding all the users from db
+    console.log('hospitalsCount', hospitalsCount);
     const studentsCount = await Students.find().countDocuments(); // Finding all the users from db
-    const schoolsCount = await Schools.find().countDocuments(); // Finding all the users from db
+    const schoolsCount = await Schools.find().countDocuments({ active: true }); // Finding all the users from db
     return res.json({ success: true, count: { hospitalsCount, studentsCount, schoolsCount } }); // Success
   } catch (err) {
     // Error handling

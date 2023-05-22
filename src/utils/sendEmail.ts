@@ -119,7 +119,14 @@ export const sendCSVEmail = async (
   });
 };
 
-export const sendEvaluationEmail = async (email: string, attachment: string): Promise<object> => {
+export const sendEvaluationEmail = async (
+  email: string,
+  attachment: string,
+  studentName: string,
+  ElectiveName: string,
+  startDate: string,
+  duration: string,
+): Promise<object> => {
   return await new Promise((resolve, reject) => {
     console.log('email111', email);
     // Send email options
@@ -127,7 +134,7 @@ export const sendEvaluationEmail = async (email: string, attachment: string): Pr
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
       subject: 'Clinical Evaluation',
-      text: ` Attached is the clinical evaluation for the SGU medical student that has/is completing your elective this month. Please complete, sign and return it to the Department of Medicine Student Coordinator, Christina Oquendo, via:
+      text: `Student Name :  ${studentName} \n Elective Name :  ${ElectiveName} \n Start Date :  ${startDate} \n Duration :  ${duration} \n  Attached is the clinical evaluation for the SGU medical student that has/is completing your elective this month. Please complete, sign and return it to the Department of Medicine Student Coordinator, Christina Oquendo, via:
 - email: Christina.Oquendo@rwjbh.org
 OR
 - directly to her office: 1E Department of Medicine`,

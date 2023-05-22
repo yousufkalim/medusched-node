@@ -101,7 +101,7 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
  */
 export const getAllStudents = async (_req: Request, res: Response): Promise<Response> => {
   try {
-    const users = await Students.find(); // Finding all the users from db
+    const users = await Students.find().populate('school'); // Finding all the users from db
     return res.json({ success: true, users }); // Success
   } catch (err) {
     // Error handling

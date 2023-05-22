@@ -170,7 +170,9 @@ export const getAllElectivesOfHospital = async (
     const { _id } = hospital;
     const electives = await Electives.find({
       hospital: _id,
-    }); // Finding all the Electives from db
+    })
+      .populate('hospital')
+      .populate('students'); // Finding all the Electives from db
 
     // Here we can fing electives of specific hospital or all electives related to specific hospital.
 
@@ -188,7 +190,7 @@ export const getAllElectivesOfHospital = async (
 };
 export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const electives = await Electives.find({}); // Finding all the Electives from db
+    const electives = await Electives.find().populate('hospital').populate('students'); // Finding all the Electives from db
     return res.json({ success: true, electives }); // Success
   } catch (err) {
     // Error handling
@@ -220,7 +222,7 @@ export const getAllAffiliatedElectives = async (
     // now find electives with affiliated hospitals
     const affiliatedElectives = await Electives.find({
       hospital: { $in: ids },
-    });
+    }).populate('hospital');
     return res.json({ success: true, electives: affiliatedElectives }); // Success
   } catch (err) {
     // Error handling
