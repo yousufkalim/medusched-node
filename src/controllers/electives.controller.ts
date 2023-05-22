@@ -259,7 +259,7 @@ export const getAllElectivesByHospital = async (
 export const getSingleElective = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const electiveId = req.params.electiveId; // Getting Elective id from URL parameter
-    const elective = await Electives.findById(electiveId).populate('students'); // the elective
+    const elective = await Electives.findById(electiveId).populate('hospital').populate('students'); // the elective
     return res.json({ success: true, elective }); // Success
   } catch (err) {
     // Error handling
