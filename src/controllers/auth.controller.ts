@@ -186,7 +186,7 @@ export const evaluationemail = async (req: IRequest, res: Response): Promise<Res
 
     // Sending email to hospital
     // attachment path
-    const attachmentPath = path.join(__dirname, '..', 'utils', `assementmedusched.pdf`);
+    const attachmentPath = path.join(__dirname, '..', '..', 'src', 'utils', `assementmedusched.pdf`);
     const studentName = student?.name;
     const ElectiveName = elective?.title;
     const startDate = moment(elective?.start_date).format('MM-DD-YYYY');
