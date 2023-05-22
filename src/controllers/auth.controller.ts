@@ -169,7 +169,6 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
 export const evaluationemail = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const { email, id, electiveId } = req.body;
-    console.log('email1111', email, electiveId);
     const student = await Students.findById(id);
     if (!student) {
       return res.status(409).json({
@@ -188,7 +187,6 @@ export const evaluationemail = async (req: IRequest, res: Response): Promise<Res
     // Sending email to hospital
     // attachment path
     const attachmentPath = path.join(__dirname, '..', 'utils', `assementmedusched.pdf`);
-    console.log('attachmentPath', attachmentPath, student, elective);
     const studentName = student?.name;
     const ElectiveName = elective?.title;
     const startDate = moment(elective?.start_date).format('MM-DD-YYYY');
