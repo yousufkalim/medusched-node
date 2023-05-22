@@ -86,13 +86,14 @@ export const getAllSchoolsforUser = async (_req: IRequest, res: Response): Promi
 export const deleteSchool = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const schoolId = req.params.schoolId; // Getting School id from URL parameter
-    await Schools.findByIdAndUpdate(
-      schoolId,
-      {
-        active: false,
-      },
-      { new: true },
-    ); // Deleting the school
+    // await Schools.findByIdAndUpdate(
+    //   schoolId,
+    //   {
+    //     active: false,
+    //   },
+    //   { new: true },
+    // ); // Deleting the school
+    await Schools.findByIdAndDelete(schoolId); // Deleting the school
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
