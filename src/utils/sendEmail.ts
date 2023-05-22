@@ -3,11 +3,17 @@
  * @author Yousuf Kalim
  */
 import nodemailer from 'nodemailer';
-import { MAILER_DOMAIN, MAILER_EMAIL, MAILER_PASSWORD } from 'config';
+import { MAILER_DOMAIN, MAILER_EMAIL, MAILER_PASSWORD, MAILER_PORT, MAILER_HOST } from "config";
 
 // Sender mail server config
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  // @ts-expect-error
+  host: MAILER_HOST,
+  port: MAILER_PORT,
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: true,
+  },
   auth: {
     user: MAILER_EMAIL,
     pass: MAILER_PASSWORD,
