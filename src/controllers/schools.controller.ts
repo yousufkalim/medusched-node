@@ -2,6 +2,8 @@ import { Response } from 'express';
 import Admins from '@models/admins.model';
 import IRequest from '@interfaces/request.interface';
 import Schools from '@models/schools.model';
+import Students from '@models/students.model';
+import Hospitals from '@models/hospitals.model';
 import Admin from '@interfaces/admins.interface';
 import School from '@interfaces/schools.interface';
 import Student from '@interfaces/students.interface';
@@ -86,14 +88,13 @@ export const getAllSchoolsforUser = async (_req: IRequest, res: Response): Promi
 export const deleteSchool = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const schoolId = req.params.schoolId; // Getting School id from URL parameter
-    // await Schools.findByIdAndUpdate(
-    //   schoolId,
-    //   {
-    //     active: false,
-    //   },
-    //   { new: true },
-    // ); // Deleting the school
     await Schools.findByIdAndDelete(schoolId); // Deleting the school
+
+    await Students.deleteMany({ school: schoolId });
+
+    // Update all hospitals that have the schoolId in their schools array
+    await Hospitals.updateMany({ schools: schoolId }, { $pull: { schools: schoolId } });
+
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling

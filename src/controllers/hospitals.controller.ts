@@ -151,13 +151,9 @@ export const deleteHospital = async (req: Request, res: Response): Promise<Respo
   try {
     const hospitalId = req.params.hospitalId; // Getting hospital id from URL parameter
     console.log('hospitalId', hospitalId);
-    await Hospitals.findByIdAndUpdate(
-      hospitalId,
-      {
-        active: false,
-      },
-      { new: true },
-    ); // Deleting the hospital
+    await Hospitals.findByIdAndDelete(hospitalId); // Deleting the hospital
+    // if a student register with school 1 then what we do if hospital(have electives) delete that link with school 1
+
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
