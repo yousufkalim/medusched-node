@@ -164,7 +164,10 @@ export const updateStudent = async (req: Request, res: Response): Promise<Respon
 export const deleteStudent = async (req: Request, res: Response): Promise<Response> => {
   try {
     const studentId = req.params.studentId; // Getting student id from URL parameter
-    const user = await Students.findByIdAndUpdate(studentId, { active: false }, { new: true }); // Deleting the student
+    console.log('studentId', studentId);
+    const user = await Students.findByIdAndDelete(studentId); // Deleting the student
+    // when student delete pop student id from array of elective if exists
+
     return res.json({ success: true, user }); // Success
   } catch (err) {
     // Error handling

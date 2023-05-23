@@ -33,7 +33,7 @@ router.get('/:userId', checkUserAuth, getStudentById); // Get one student by it'
 router.put('/:userId', checkUserAuth, updateStudent); // Update a specific student by it's id
 
 // Delete
-router.delete('/:userId', checkUserAuth, deleteStudent); // delete a specific student by it's id
+router.delete('/:studentId', checkUserAuth, deleteStudent); // delete a specific student by it's id
 
 router.put('/verifystudent/:token', VerifyStudent); // Verify Student
 
