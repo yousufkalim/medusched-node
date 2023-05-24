@@ -6,6 +6,7 @@ import {
   getAllStudents,
   getStudentById,
   deleteStudent,
+  ActivateStudent,
   VerifyStudent,
 } from '@controllers/students.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
@@ -34,6 +35,7 @@ router.put('/:userId', checkUserAuth, updateStudent); // Update a specific stude
 
 // Delete
 router.delete('/:studentId', checkUserAuth, deleteStudent); // delete a specific student by it's id
+router.put('/activate/:studentId', checkUserAuth, ActivateStudent); // delete a specific student by it's id
 
 router.put('/verifystudent/:token', VerifyStudent); // Verify Student
 
