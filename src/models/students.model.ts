@@ -37,7 +37,7 @@ const studentSchema = new Schema(
     address: String,
     active: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {

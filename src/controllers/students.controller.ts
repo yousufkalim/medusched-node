@@ -6,8 +6,9 @@ import Auth from '@/interfaces/auth.interface';
 // import School from '@/interfaces/schools.interface';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
-import { verifyStudent } from '@/utils/sendEmail';
+import { BCRYPT_SALT, JWT_SECRET } from '@config';
+// import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
+// import { verifyStudent } from '@/utils/sendEmail';
 
 /**
  * Create User - Signup
@@ -39,8 +40,8 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
     } else {
       return res.status(409).json({ success: false, message: 'School does not exist' });
     }
-    const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
-    await verifyStudent(email, `${ORIGIN}/verify/${token}`);
+    // const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
+    // await verifyStudent(email, `${ORIGIN}/verify/${token}`);
 
     // // Done
     return res.json({ success: true, message: 'Student Created Successfully.Please Verify' }); // Success
@@ -67,7 +68,7 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
       return res.status(404).json({ success: false, message: 'student not found' });
     } else if (!student.active) {
       // If student not found or not active
-      return res.status(400).json({ success: false, message: 'Please Verify Your Email First' });
+      return res.status(400).json({ success: false, message: 'Account not active' });
     }
 
     // Comparing password
@@ -145,6 +146,27 @@ export const updateStudent = async (req: Request, res: Response): Promise<Respon
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
     }
+
+    const student = await Students.findByIdAndUpdate(studentId, body, { new: true }); // Updating the student
+    return res.json({ success: true, student }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Activate user
+ * @param {object} req
+ * @param {object} res
+ */
+export const ActivateStudent = async (req: Request, res: Response): Promise<Response> => {
+  const body: Student = req.body;
+
+  try {
+    const studentId = req.params.studentId; // Getting studnet id from URL parameter
 
     const student = await Students.findByIdAndUpdate(studentId, body, { new: true }); // Updating the student
     return res.json({ success: true, student }); // Success
