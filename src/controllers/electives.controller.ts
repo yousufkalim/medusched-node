@@ -172,7 +172,14 @@ export const ExtendElective = async (req: IRequest, res: Response): Promise<Resp
       return res.status(409).json({ success: false, message: 'Elective not found' });
     }
     // find student whose duration will extend in this elective
-    const student = elective.students.find((student) => student.studentId === studentId);
+    // const student = elective.students.find(
+    //   (student) => student?.studentId?.toString() === studentId,
+    // );
+    const student = elective.students.find((student) => {
+      const studentIdString = student?.studentId;
+      return studentIdString && studentIdString === studentId;
+    });
+
     console.log('elective before', elective);
     if (!student) {
       return res.status(409).json({

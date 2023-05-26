@@ -19,9 +19,13 @@ export function checkElectiveConflict(
     const existingStartDate = new Date(existingElective.start_date);
 
     // Find the student in the existingElective with the provided studentId
-    const existingStudent = existingElective.students.find(
-      (student) => student?.studentId === studentId,
-    );
+    // const existingStudent = existingElective.students.find(
+    //   (student) => student?.studentId?.toString() === studentId,
+    // );
+    const existingStudent = existingElective.students.find((student) => {
+      const studentIdString = student?.studentId;
+      return studentIdString && studentIdString === studentId;
+    });
 
     if (existingStudent) {
       const existingStudentStartDate = new Date(existingStartDate.getTime());
