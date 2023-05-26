@@ -2,11 +2,16 @@ import Hospital from './hospitals.interface';
 import School from './schools.interface';
 import Student from './students.interface';
 
+interface IStudent {
+  studentId: Student | string;
+  duration: string;
+}
 export default interface Elective {
   _id: string;
   hospital: Hospital | string;
   schools: School[] | string[];
-  students: Student[] | string[];
+  // students: Student[] | string[];
+  students: IStudent[];
   title: string;
   description: string;
   start_date: Date;

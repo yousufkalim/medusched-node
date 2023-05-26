@@ -81,15 +81,19 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
         message: 'Invalid electiveId Id or elective not exists',
       });
     }
-    const getstudentAppliedElectives = await Students.findById(studentId).populate('electives');
+
+    const getstudentAppliedElectives = await Electives.find({
+      'students.studentId': { $in: [studentId] },
+    });
+
     const getElective = await Electives.findById(electiveId);
     if (!getElective) {
       return res.status(409).json({ success: false, message: 'No Elective Found' });
     }
-
     const conflict = checkElectiveConflict(
-      getstudentAppliedElectives?.electives ? getstudentAppliedElectives?.electives : [],
+      getstudentAppliedElectives || [],
       getElective,
+      studentId,
     );
     console.log('conflict', conflict);
     if (conflict) {
@@ -100,21 +104,17 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
     }
     await Students.findByIdAndUpdate(studentId, { phone, name }, { new: true }); // Updating the student data
 
-    const a = await Students.findByIdAndUpdate(
+    await Students.findByIdAndUpdate(
       studentId,
       { $push: { electives: electiveId } },
       { new: true },
     );
-
+    // Updating the elective
     await Electives.findByIdAndUpdate(
       electiveId,
-      { $push: { students: studentId } },
+      { $push: { students: { studentId, duration: getElective?.duration } } },
       { new: true },
     );
-
-    // Updating the elective
-    console.log('a is', a);
-
     //  student should receive email to applied electives
     // await sendApplyConfirmationEmail(email);
     return res.json({ success: true, message: 'Applied successfully' }); // Success
@@ -160,6 +160,44 @@ export const RemoveStudentFromElective = async (
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+export const ExtendElective = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const studentId = req.params.studentid; // Getting Elective id from URL parameter
+    const electiveId = req.body.electiveID;
+    const studentDuraion = req.body.studentDuration;
+
+    // find Elective of given ID
+    const elective: Elective | null = await Electives.findById(electiveId);
+    if (!elective) {
+      return res.status(409).json({ success: false, message: 'Elective not found' });
+    }
+    // find student whose duration will extend in this elective
+    const student = elective.students.find((student) => student.studentId === studentId);
+    console.log('elective before', elective);
+    if (!student) {
+      return res.status(409).json({
+        success: false,
+        message: 'Student not found',
+      });
+    }
+    // update duration of student
+    student.duration = studentDuraion;
+
+    console.log('elective after', elective);
+
+    // Update the elective with new student duration
+    await Electives.findByIdAndUpdate(electiveId, elective, {
+      new: true,
+    });
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 
 export const getAllElectivesOfHospital = async (
   _req: IRequest,
@@ -172,7 +210,7 @@ export const getAllElectivesOfHospital = async (
       hospital: _id,
     })
       .populate('hospital')
-      .populate('students'); // Finding all the Electives from db
+      .populate('students.studentId'); // Finding all the Electives from db
 
     // Here we can fing electives of specific hospital or all electives related to specific hospital.
 
@@ -190,7 +228,7 @@ export const getAllElectivesOfHospital = async (
 };
 export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const electives = await Electives.find().populate('hospital').populate('students'); // Finding all the Electives from db
+    const electives = await Electives.find().populate('hospital').populate('students.studentId'); // Finding all the Electives from db
     return res.json({ success: true, electives }); // Success
   } catch (err) {
     // Error handling
@@ -259,7 +297,9 @@ export const getAllElectivesByHospital = async (
 export const getSingleElective = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const electiveId = req.params.electiveId; // Getting Elective id from URL parameter
-    const elective = await Electives.findById(electiveId).populate('hospital').populate('students'); // the elective
+    const elective = await Electives.findById(electiveId)
+      .populate('hospital')
+      .populate('students.studentId'); // the elective
     return res.json({ success: true, elective }); // Success
   } catch (err) {
     // Error handling
