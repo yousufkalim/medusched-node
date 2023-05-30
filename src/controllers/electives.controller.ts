@@ -7,7 +7,7 @@ import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
 // import { sendApplyConfirmationEmail } from '@utils/sendEmail';
-import { checkElectiveConflict } from '@utils/checkElectiveConflicts';
+import { checkElectiveConflict, checkExtendElectiveConflict } from '@utils/checkElectiveConflicts';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
   const user = req.user as Hospital;
@@ -144,13 +144,20 @@ export const RemoveStudentFromElective = async (
       },
     ); // Updating the Students
     // remove from Elective array of student
+    // await Electives.findByIdAndUpdate(
+    //   electiveId,
+    //   { $pull: { students: studentId } },
+    //   {
+    //     new: true,
+    //   },
+    // ); // Updating the Elective
     await Electives.findByIdAndUpdate(
       electiveId,
-      { $pull: { students: studentId } },
+      { $pull: { students: { studentId } } },
       {
         new: true,
       },
-    ); // Updating the Elective
+    );
 
     return res.json({ success: true }); // Success
   } catch (err) {
@@ -176,11 +183,11 @@ export const ExtendElective = async (req: IRequest, res: Response): Promise<Resp
     //   (student) => student?.studentId?.toString() === studentId,
     // );
     const student = elective.students.find((student) => {
-      const studentIdString = student?.studentId;
-      return studentIdString && studentIdString === studentId;
+      const studentIdString = student?.studentId as string;
+      console.log('studentIdString', studentIdString, studentId);
+      return studentIdString && studentIdString.toString() === studentId;
     });
 
-    console.log('elective before', elective);
     if (!student) {
       return res.status(409).json({
         success: false,
@@ -190,12 +197,23 @@ export const ExtendElective = async (req: IRequest, res: Response): Promise<Resp
     // update duration of student
     student.duration = studentDuraion;
 
-    console.log('elective after', elective);
+    // check conflicts
+    const getstudentAppliedElectives = await Electives.find({
+      _id: { $ne: electiveId },
+      'students.studentId': { $in: [studentId] },
+    });
+
+    const conflict = checkExtendElectiveConflict(
+      getstudentAppliedElectives,
+      elective,
+      studentDuraion,
+    );
+    console.log('conflict', conflict);
 
     // Update the elective with new student duration
-    await Electives.findByIdAndUpdate(electiveId, elective, {
-      new: true,
-    });
+    // await Electives.findByIdAndUpdate(electiveId, elective, {
+    //   new: true,
+    // });
 
     return res.json({ success: true }); // Success
   } catch (err) {

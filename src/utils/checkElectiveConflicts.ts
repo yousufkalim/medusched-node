@@ -7,11 +7,6 @@ export function checkElectiveConflict(
 ): boolean {
   // Convert newElective start_date to a Date object
   const newStartDate = new Date(newElective.start_date);
-  console.log('newStartDate', newStartDate);
-  console.log('newElective', newElective);
-  console.log('studentId', studentId);
-  console.log('existingElectives', existingElectives);
-  console.log('existingElective.students', existingElectives[0]?.students);
 
   // Loop through the existingElectives array
   for (let i = 0; i < existingElectives.length; i++) {
@@ -23,8 +18,8 @@ export function checkElectiveConflict(
     //   (student) => student?.studentId?.toString() === studentId,
     // );
     const existingStudent = existingElective.students.find((student) => {
-      const studentIdString = student?.studentId;
-      return studentIdString && studentIdString === studentId;
+      const studentIdString = student?.studentId as string;
+      return studentIdString && studentIdString.toString() === studentId;
     });
 
     if (existingStudent) {
@@ -41,12 +36,47 @@ export function checkElectiveConflict(
 
       // Check for conflicts
       if (
-        (newStartDate >= existingStudentStartDate && newStartDate <= existingStudentEndDate) ||
-        (newEndDate >= existingStudentStartDate && newEndDate <= existingStudentEndDate) ||
-        (newStartDate <= existingStudentStartDate && newEndDate >= existingStudentEndDate)
+        (newStartDate > existingStudentStartDate && newStartDate < existingStudentEndDate) ||
+        (newEndDate > existingStudentStartDate && newEndDate < existingStudentEndDate) ||
+        (newStartDate < existingStudentStartDate && newEndDate > existingStudentEndDate)
       ) {
         return true; // Conflict found
       }
+    }
+  }
+
+  return false; // No conflict found
+}
+export function checkExtendElectiveConflict(
+  existingElectives: Elective[],
+  newElective: Elective,
+  newDuration: string,
+): boolean {
+  // Convert newElective start_date to a Date object
+  const newStartDate = new Date(newElective.start_date);
+
+  // Calculate the new end date based on the duration
+  const newEndDate = new Date(
+    newStartDate.getTime() + parseInt(newDuration) * 7 * 24 * 60 * 60 * 1000,
+  );
+
+  // Loop through the existingElectives array
+  for (let i = 0; i < existingElectives.length; i++) {
+    const existingElective = existingElectives[i];
+    const existingStartDate = new Date(existingElective.start_date);
+
+    // Calculate the existing end date based on the duration
+    const existingEndDate = new Date(
+      existingStartDate.getTime() + parseInt(existingElective.duration) * 7 * 24 * 60 * 60 * 1000,
+    );
+
+    // Check for conflicts
+    if (
+      (newStartDate > existingStartDate && newStartDate < existingEndDate) ||
+      (newEndDate > existingStartDate && newEndDate < existingEndDate) ||
+      (newStartDate < existingStartDate && newEndDate > existingEndDate)
+    ) {
+      return true; // Conflict found
     }
   }
 
