@@ -102,7 +102,7 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
         message: ' Your date is overlapping with another Applied Elective',
       });
     }
-    await Students.findByIdAndUpdate(studentId, { phone, name }, { new: true }); // Updating the student data
+    await Students.findByIdAndUpdate(studentId, { phone, name, stdId: body?.stdId }, { new: true }); // Updating the student data
 
     await Students.findByIdAndUpdate(
       studentId,
