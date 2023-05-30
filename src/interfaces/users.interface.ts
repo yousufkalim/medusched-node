@@ -4,6 +4,7 @@
  */
 export default interface User {
   name: string;
+  stdId?: string;
   email: string;
   password: string;
   number: string;
