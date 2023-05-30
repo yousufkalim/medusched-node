@@ -14,10 +14,16 @@ const electiveSchema = new Schema(
         ref: 'School',
       },
     ],
+    // students: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Student',
+    //   },
+    // ],
     students: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'Student',
+        studentId: { type: Schema.Types.ObjectId, ref: 'Student' },
+        duration: { type: String },
       },
     ],
     title: {

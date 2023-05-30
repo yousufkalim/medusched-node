@@ -8,6 +8,7 @@ import {
   getAllElectivesByHospital,
   applyElective,
   RemoveStudentFromElective,
+  ExtendElective,
   updateElective,
   deleteElective,
 } from '@controllers/electives.controller';
@@ -17,6 +18,7 @@ const router = Router();
 router.post('/', checkUserAuth, createElectives); // Create Elective
 router.put('/applyelective', checkUserAuth, applyElective); // Create Elective
 router.put('/deletestudent/:studentid', checkUserAuth, RemoveStudentFromElective); // Remove Student from elective by Hospital
+router.put('/extendElective/:studentid', checkUserAuth, ExtendElective); // Remove Student from elective by Hospital
 
 router.get('/', checkUserAuth, getAllElectivesOfHospital); // get all Elective of a hospital
 router.get('/all', checkUserAuth, getAllElectives); // get all  Electives
