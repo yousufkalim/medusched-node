@@ -211,9 +211,9 @@ export const ExtendElective = async (req: IRequest, res: Response): Promise<Resp
     console.log('conflict', conflict);
 
     // Update the elective with new student duration
-    // await Electives.findByIdAndUpdate(electiveId, elective, {
-    //   new: true,
-    // });
+    await Electives.findByIdAndUpdate(electiveId, elective, {
+      new: true,
+    });
 
     return res.json({ success: true }); // Success
   } catch (err) {
