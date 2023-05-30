@@ -235,7 +235,20 @@ export const getAllElectivesOfHospital = async (
       hospital: _id,
     })
       .populate('hospital')
-      .populate('students.studentId'); // Finding all the Electives from db
+      .populate('students.studentId')
+      .sort({ start_date: 1 }); // Finding all the Electives from db
+    electives.sort((a: Elective, b: Elective) => {
+      const startDateA: Date = new Date(a.start_date);
+      const startDateB: Date = new Date(b.start_date);
+
+      if (startDateA.getMonth() === startDateB.getMonth()) {
+        return a.title.localeCompare(b.title);
+      }
+      console.log('startDateA', startDateA);
+      const sortByDate: number = startDateA.getTime() - startDateB.getTime();
+
+      return sortByDate;
+    });
 
     // Here we can fing electives of specific hospital or all electives related to specific hospital.
 
