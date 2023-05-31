@@ -8,6 +8,7 @@ import {
   deleteHospital,
   getSingleHospital,
   getCounts,
+  resetHospitalPassword,
 } from '@controllers/hospitals.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 const router = Router();
@@ -21,6 +22,8 @@ router.get('/:hospitalId', checkAdminAuth, getSingleHospital); // Get single Hos
 router.post('/login', loginHospital); // Hospital Login
 router.put('/:hospitalId', checkUserAuth, upload.single('logo'), updateHospital); // Hospital Update
 router.delete('/:hospitalId', checkUserAuth, deleteHospital); // Hospital Delete
+
+router.put('/resetPassword/:hospitalId', checkUserAuth, resetHospitalPassword); // Hospital Delete
 
 // Export
 export default router;

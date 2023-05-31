@@ -177,3 +177,29 @@ export const getCounts = async (_req: IRequest, res: Response): Promise<Response
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const resetHospitalPassword = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const hospitalId = req.params.hospitalId;
+    const { oldPassword, newPassword } = req.body; // Getting hospital id from URL parameter
+    console.log('hospitalId', hospitalId);
+    const hospital = await Hospitals.findById(hospitalId); // Deleting the hospital
+    if (!hospital) {
+      return res.status(404).json({ success: false, message: 'hospital not found' });
+    }
+    const isMatched = bcrypt.compareSync(oldPassword, hospital.password);
+    if (!isMatched) {
+      return res.status(400).json({ success: false, message: 'Old Password not Correct' });
+    }
+    const password = bcrypt.hashSync(newPassword, BCRYPT_SALT);
+    await Hospitals.findByIdAndUpdate(hospitalId, { password }, { new: true });
+    // if a student register with school 1 then what we do if hospital(have electives) delete that link with school 1
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
