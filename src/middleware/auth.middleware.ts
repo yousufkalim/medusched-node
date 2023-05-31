@@ -6,6 +6,8 @@ import { Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import IRequest from '@interfaces/request.interface';
 import { JWT_SECRET } from '@config';
+import Hospitals from '@models/hospitals.model';
+import Students from '@models/students.model';
 
 // Check auth
 export const checkAdminAuth = (
@@ -13,6 +15,7 @@ export const checkAdminAuth = (
   res: Response,
   next: NextFunction,
 ): Response | void => {
+  console.log('Test');
   // Get token from Header
   const header = req.get('Authorization');
 
@@ -54,11 +57,11 @@ export const checkAdminAuth = (
 };
 
 // Check auth
-export const checkUserAuth = (
+export const checkUserAuth = async (
   req: IRequest,
   res: Response,
   next: NextFunction,
-): Response | void => {
+): Promise<Response | void> => {
   // Get token from Header
   const header = req.get('Authorization');
 
@@ -82,7 +85,16 @@ export const checkUserAuth = (
       });
     }
 
-    req.user = user;
+    if (user.role === 'Hospital') {
+      const hospital = await Hospitals.findById(user._id);
+
+      req.user = hospital ?? user;
+    } else if (user.role === 'student') {
+      const student = await Students.findById(user._id);
+      req.user = student ?? user;
+    } else {
+      req.user = user;
+    }
 
     // If user authenticated
     res.set(
