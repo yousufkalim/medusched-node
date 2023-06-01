@@ -141,13 +141,18 @@ export const updateStudent = async (req: Request, res: Response): Promise<Respon
 
   try {
     const studentId = req.params.studentId; // Getting studnet id from URL parameter
+    console.log('studentId', studentId);
 
     // If user want to update it's password
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
     }
+    if (req.file) {
+      req.body.logo = req.file.path;
+    }
 
     const student = await Students.findByIdAndUpdate(studentId, body, { new: true }); // Updating the student
+    console.log('studentId2', student);
     return res.json({ success: true, student }); // Success
   } catch (err) {
     // Error handling
@@ -213,6 +218,32 @@ export const VerifyStudent = async (req: Request, res: Response): Promise<Respon
     } else {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const resetStudentPassword = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const studentId = req.params.studentId;
+    const { oldPassword, newPassword } = req.body; // Getting student id from URL parameter
+    console.log('studentId', studentId);
+    const student = await Students.findById(studentId); // Deleting the student
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'student not found' });
+    }
+    const isMatched = bcrypt.compareSync(oldPassword, student.password);
+    if (!isMatched) {
+      return res.status(400).json({ success: false, message: 'Old Password not Correct' });
+    }
+    const password = bcrypt.hashSync(newPassword, BCRYPT_SALT);
+    await Students.findByIdAndUpdate(studentId, { password }, { new: true });
+    // if a student register with school 1 then what we do if student(have electives) delete that link with school 1
+
+    return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

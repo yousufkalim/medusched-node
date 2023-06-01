@@ -6,6 +6,7 @@ export default interface Student {
   stdId: string;
   email: string;
   password: string;
+  logo?: string;
   school: School | string;
   electives: Elective[] | [];
   role: 'student';
