@@ -6,7 +6,7 @@ import Students from '@models/students.model';
 import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
-// import { sendApplyConfirmationEmail } from '@utils/sendEmail';
+import { sendApplyConfirmationEmail } from '@utils/sendEmail';
 import { checkElectiveConflict, checkExtendElectiveConflict } from '@utils/checkElectiveConflicts';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
@@ -68,7 +68,7 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
   const body: ApplyElective = req.body;
   try {
     const { studentId, electiveId, name, phone } = body;
-    console.log(studentId, electiveId, name);
+    console.log(studentId, electiveId, name, phone);
     if (!studentId) {
       return res.status(409).json({
         success: false,
@@ -81,6 +81,8 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
         message: 'Invalid electiveId Id or elective not exists',
       });
     }
+
+    const student = await Students.findById(studentId);
 
     const getstudentAppliedElectives = await Electives.find({
       'students.studentId': { $in: [studentId] },
@@ -96,27 +98,38 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
       studentId,
     );
     console.log('conflict', conflict);
+    console.log(student?.email);
     if (conflict) {
       return res.status(409).json({
         success: false,
         message: ' Your date is overlapping with another Applied Elective',
       });
     }
-    await Students.findByIdAndUpdate(studentId, { phone, name, stdId: body?.stdId }, { new: true }); // Updating the student data
 
-    await Students.findByIdAndUpdate(
-      studentId,
-      { $push: { electives: electiveId } },
-      { new: true },
-    );
+    // await Students.findByIdAndUpdate(
+    //   studentId,
+    //   {
+    //     $set: {
+    //       phone,
+    //       name,
+    //       stdId: body?.stdId,
+    //     },
+    //     $push: {
+    //       electives: electiveId,
+    //     },
+    //   },
+    //   { new: true },
+    // );
+
     // Updating the elective
-    await Electives.findByIdAndUpdate(
-      electiveId,
-      { $push: { students: { studentId, duration: getElective?.duration } } },
-      { new: true },
-    );
+    // await Electives.findByIdAndUpdate(
+    //   electiveId,
+    //   { $push: { students: { studentId, duration: getElective?.duration } } },
+    //   { new: true },
+    // );
     //  student should receive email to applied electives
-    // await sendApplyConfirmationEmail(email);
+
+    await sendApplyConfirmationEmail(student?.email as string);
     return res.json({ success: true, message: 'Applied successfully' }); // Success
   } catch (err) {
     // Error handling
