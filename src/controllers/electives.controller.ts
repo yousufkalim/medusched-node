@@ -106,27 +106,27 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
       });
     }
 
-    // await Students.findByIdAndUpdate(
-    //   studentId,
-    //   {
-    //     $set: {
-    //       phone,
-    //       name,
-    //       stdId: body?.stdId,
-    //     },
-    //     $push: {
-    //       electives: electiveId,
-    //     },
-    //   },
-    //   { new: true },
-    // );
+    await Students.findByIdAndUpdate(
+      studentId,
+      {
+        $set: {
+          phone,
+          name,
+          stdId: body?.stdId,
+        },
+        $push: {
+          electives: electiveId,
+        },
+      },
+      { new: true },
+    );
 
     // Updating the elective
-    // await Electives.findByIdAndUpdate(
-    //   electiveId,
-    //   { $push: { students: { studentId, duration: getElective?.duration } } },
-    //   { new: true },
-    // );
+    await Electives.findByIdAndUpdate(
+      electiveId,
+      { $push: { students: { studentId, duration: getElective?.duration } } },
+      { new: true },
+    );
     //  student should receive email to applied electives
 
     await sendApplyConfirmationEmail(student?.email as string);
