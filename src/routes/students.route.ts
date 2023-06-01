@@ -8,8 +8,10 @@ import {
   deleteStudent,
   ActivateStudent,
   VerifyStudent,
+  resetStudentPassword,
 } from '@controllers/students.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
+import { upload } from '../middleware/multer.middleware';
 const router = Router();
 
 /**
@@ -31,13 +33,15 @@ router.get('/', checkUserAuth, getAllStudents); // Get all students at once
 router.get('/:userId', checkUserAuth, getStudentById); // Get one student by it's id
 
 // Update
-router.put('/:userId', checkUserAuth, updateStudent); // Update a specific student by it's id
+router.put('/:studentId', checkUserAuth, upload.single('logo'), updateStudent); // Update a specific student by it's id
 
 // Delete
 router.delete('/:studentId', checkUserAuth, deleteStudent); // delete a specific student by it's id
 router.put('/activate/:studentId', checkUserAuth, ActivateStudent); // delete a specific student by it's id
 
 router.put('/verifystudent/:token', VerifyStudent); // Verify Student
+
+router.put('/resetPassword/:studentId', checkUserAuth, resetStudentPassword); // Hospital Delete
 
 // Export
 export default router;

@@ -22,6 +22,9 @@ const studentSchema = new Schema(
       required: true,
       minlength: 8,
     },
+    logo: {
+      type: String,
+    },
     school: {
       type: Schema.Types.ObjectId,
       ref: 'School',
