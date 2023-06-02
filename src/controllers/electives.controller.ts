@@ -280,6 +280,19 @@ export const getAllElectivesOfHospital = async (
 export const getAllElectives = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
     const electives = await Electives.find().populate('hospital').populate('students.studentId'); // Finding all the Electives from db
+
+    electives.sort((a: Elective, b: Elective) => {
+      const startDateA: Date = new Date(a.start_date);
+      const startDateB: Date = new Date(b.start_date);
+
+      if (startDateA.getMonth() === startDateB.getMonth()) {
+        return a.title.localeCompare(b.title);
+      }
+      console.log('startDateA', startDateA);
+      const sortByDate: number = startDateA.getTime() - startDateB.getTime();
+
+      return sortByDate;
+    });
     return res.json({ success: true, electives }); // Success
   } catch (err) {
     // Error handling
@@ -312,6 +325,19 @@ export const getAllAffiliatedElectives = async (
     const affiliatedElectives = await Electives.find({
       hospital: { $in: ids },
     }).populate('hospital');
+
+    affiliatedElectives.sort((a: Elective, b: Elective) => {
+      const startDateA: Date = new Date(a.start_date);
+      const startDateB: Date = new Date(b.start_date);
+
+      if (startDateA.getMonth() === startDateB.getMonth()) {
+        return a.title.localeCompare(b.title);
+      }
+      console.log('startDateA', startDateA);
+      const sortByDate: number = startDateA.getTime() - startDateB.getTime();
+
+      return sortByDate;
+    });
     return res.json({ success: true, electives: affiliatedElectives }); // Success
   } catch (err) {
     // Error handling
