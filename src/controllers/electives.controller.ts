@@ -222,6 +222,12 @@ export const ExtendElective = async (req: IRequest, res: Response): Promise<Resp
       studentDuraion,
     );
     console.log('conflict', conflict);
+    if (conflict) {
+      return res.status(409).json({
+        success: false,
+        message: 'Date is overlapping with another Applied Elective',
+      });
+    }
 
     // Update the elective with new student duration
     await Electives.findByIdAndUpdate(electiveId, elective, {
