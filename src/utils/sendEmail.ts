@@ -185,6 +185,27 @@ export const sendApplyConfirmationEmail = async (email: string): Promise<object>
   });
 };
 
+export const sendmailtoRemoveStudent = async (email: string): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Removed from Elective',
+      text: `You have been removed from elective`,
+    };
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};
 const ConfirmationTemplate = (): string => {
   return `
   <body style="margin: 0; padding: 0">
