@@ -7,7 +7,7 @@ import Students from '@models/students.model';
 import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
-import { sendApplyConfirmationEmail } from '@utils/sendEmail';
+import { sendApplyConfirmationEmail, sendmailtoRemoveStudent } from '@utils/sendEmail';
 import { checkElectiveConflict, checkExtendElectiveConflict } from '@utils/checkElectiveConflicts';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
@@ -146,6 +146,7 @@ export const RemoveStudentFromElective = async (
 ): Promise<Response> => {
   try {
     const studentId = req.params.studentid; // Getting Elective id from URL parameter
+    const student = await Students.findById(studentId);
     const electiveId = req.body.electiveID;
     console.log('studentid', studentId);
     console.log('electiveId', electiveId);
@@ -172,7 +173,7 @@ export const RemoveStudentFromElective = async (
         new: true,
       },
     );
-
+    await sendmailtoRemoveStudent(student?.email as string);
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
