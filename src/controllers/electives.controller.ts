@@ -322,23 +322,27 @@ export const getAllAffiliatedElectives = async (
     if (!student) {
       return res.status(409).json({ success: false, message: 'Student not Found' });
     }
-    // find affiliated hospital with student's school id
-    // const affiliatedHospitals = await Hospitals.find(
-    //   { schools: { $in: [student?.school] } },
-    //   { _id: 1 },
-    // );
-
-    // get school of student which have array of hospitals
+    // for old data find affiliated hospital with student's school id
+    const affiliatedHospitals = await Hospitals.find(
+      { schools: { $in: [student?.school] } },
+      { _id: 1 },
+    );
     const getStudentSchool = await Schools.findById(student?.school);
+
+    const oldDataIds = affiliatedHospitals.map((idObj) => idObj._id);
+    // get school of student which have array of hospitals
     const ids = getStudentSchool?.hospitals.map((id) => id);
-    // Extract the hospital IDs from the hospitalIds array
-    // const ids = affiliatedHospitals.map((idObj) => idObj._id);
-    console.log('ids,', ids);
+
+    const bothIds = ids?.concat(oldDataIds);
+    console.log('oldDataIds', oldDataIds);
+    console.log('ids', ids);
+    console.log('bothIds', bothIds);
+
     // now find electives with affiliated hospitals
     const affiliatedElectives = await Electives.find({
-      hospital: { $in: ids },
+      hospital: { $in: bothIds },
     }).populate('hospital');
-
+    console.log('bothIds222', bothIds);
     affiliatedElectives.sort((a: Elective, b: Elective) => {
       const startDateA: Date = new Date(a.start_date);
       const startDateB: Date = new Date(b.start_date);

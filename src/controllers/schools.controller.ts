@@ -63,7 +63,7 @@ export const updateSchool = async (req: IRequest, res: Response): Promise<Respon
 
 export const getAllSchools = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const schools = await Schools.find(); // Finding all the Schools from db
+    const schools = await Schools.find().populate('hospitals'); // Finding all the Schools from db
     return res.json({ success: true, schools }); // Success
   } catch (err) {
     // Error handling

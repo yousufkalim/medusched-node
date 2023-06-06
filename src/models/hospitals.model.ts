@@ -25,12 +25,12 @@ const hospitalSchema = new Schema(
         ref: 'Elective',
       },
     ],
-    // schools: [
-    //   {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'School',
-    //   },
-    // ],
+    schools: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'School',
+      },
+    ],
     address: {
       type: String,
     },
