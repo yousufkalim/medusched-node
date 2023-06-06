@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import IRequest from '@interfaces/request.interface';
 import Hospitals from '@models/hospitals.model';
+import Schools from '@models/schools.model';
 import Electives from '@models/electives.model';
 import Students from '@models/students.model';
 import Hospital from '@interfaces/hospitals.interface';
@@ -322,12 +323,17 @@ export const getAllAffiliatedElectives = async (
       return res.status(409).json({ success: false, message: 'Student not Found' });
     }
     // find affiliated hospital with student's school id
-    const affiliatedHospitals = await Hospitals.find(
-      { schools: { $in: [student?.school] } },
-      { _id: 1 },
-    );
+    // const affiliatedHospitals = await Hospitals.find(
+    //   { schools: { $in: [student?.school] } },
+    //   { _id: 1 },
+    // );
+
+    // get school of student which have array of hospitals
+    const getStudentSchool = await Schools.findById(student?.school);
+    const ids = getStudentSchool?.hospitals.map((id) => id);
     // Extract the hospital IDs from the hospitalIds array
-    const ids = affiliatedHospitals.map((idObj) => idObj._id);
+    // const ids = affiliatedHospitals.map((idObj) => idObj._id);
+    console.log('ids,', ids);
     // now find electives with affiliated hospitals
     const affiliatedElectives = await Electives.find({
       hospital: { $in: ids },

@@ -14,6 +14,12 @@ const schoolSchema = new Schema(
         ref: 'Student',
       },
     ],
+    hospitals: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Hospital',
+      },
+    ],
     name: {
       type: String,
       required: true,
