@@ -126,7 +126,7 @@ export const loginHospital = async (req: IRequest, res: Response): Promise<Respo
 
 export const getAllHospital = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const hospitals = await Hospitals.find().populate('schools'); // Finding all the users from db
+    const hospitals = await Hospitals.find(); // Finding all the users from db
     return res.json({ success: true, hospitals }); // Success
   } catch (err) {
     // Error handling
@@ -138,7 +138,7 @@ export const getAllHospital = async (_req: IRequest, res: Response): Promise<Res
 export const getSingleHospital = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const hospitalId = req.params.hospitalId;
-    const hospital = await Hospitals.findById(hospitalId).populate('schools'); // Finding all the users from db
+    const hospital = await Hospitals.findById(hospitalId); // Finding all the users from db
     return res.json({ success: true, user: { ...hospital } }); // Success
   } catch (err) {
     // Error handling
