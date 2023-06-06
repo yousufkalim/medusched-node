@@ -14,3 +14,15 @@ export default interface Student {
   phone?: string;
   active: boolean;
 }
+
+export interface IStudents {
+  name: string;
+  studentId: IStudentId;
+  duration: string;
+  _id: string;
+}
+
+interface IStudentId {
+  _id: string;
+  email: string;
+}

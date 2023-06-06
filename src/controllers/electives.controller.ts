@@ -7,8 +7,13 @@ import Students from '@models/students.model';
 import Hospital from '@interfaces/hospitals.interface';
 import Elective from '@interfaces/electives.interface';
 import ApplyElective from '@interfaces/applyelectives.interface';
-import { sendApplyConfirmationEmail, sendmailtoRemoveStudent } from '@utils/sendEmail';
+import {
+  sendApplyConfirmationEmail,
+  sendmailtoRemoveStudent,
+  sendmailtoStudentOnRemoveElective,
+} from '@utils/sendEmail';
 import { checkElectiveConflict, checkExtendElectiveConflict } from '@utils/checkElectiveConflicts';
+import { IStudents } from '@/interfaces/students.interface';
 
 export const createElectives = async (req: IRequest, res: Response): Promise<Response> => {
   const user = req.user as Hospital;
@@ -413,6 +418,16 @@ export const deleteElective = async (req: IRequest, res: Response): Promise<Resp
       },
       { new: true },
     ); // Deleting the elective
+    console.log(electiveId, 'electiveId');
+    const elective = await Electives.findById(electiveId).populate({
+      path: 'students.studentId',
+      select: 'email',
+    });
+
+    console.log(elective?.students, 'elective');
+    const allStudents: any = elective?.students;
+    const studentEmails = allStudents?.map((item: IStudents) => item?.studentId?.email);
+    await sendmailtoStudentOnRemoveElective(studentEmails);
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
