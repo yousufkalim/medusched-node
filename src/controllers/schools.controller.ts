@@ -145,7 +145,7 @@ export const loginSchool = async (req: IRequest, res: Response): Promise<Respons
     const { email, password } = body;
 
     // Getting Hospital from db
-    const school = await Schools.findOne({ email });
+    const school = await Schools.findOne({ email }).populate('students');
 
     if (!school) {
       // If hospital not found
