@@ -37,7 +37,7 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
     const getSchool = await Schools.findById(school); // Finding school by id
     if (getSchool) {
       getSchool.students.push(student._id); // Adding student in school schema
-      // await getSchool.save(); // Saving school schema
+      await getSchool.save(); // Saving school schema
     } else {
       return res.status(409).json({ success: false, message: 'School does not exist' });
     }
