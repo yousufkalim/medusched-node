@@ -9,6 +9,7 @@ import {
   ActivateStudent,
   VerifyStudent,
   resetStudentPassword,
+  getStudentsforSchool,
 } from '@controllers/students.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
 import { upload } from '../middleware/multer.middleware';
@@ -42,6 +43,8 @@ router.put('/activate/:studentId', checkUserAuth, ActivateStudent); // delete a 
 router.put('/verifystudent/:token', VerifyStudent); // Verify Student
 
 router.put('/resetPassword/:studentId', checkUserAuth, resetStudentPassword); // Hospital Delete
+
+router.get('/schoolStudents', checkUserAuth, getStudentsforSchool); // Get all students at once
 
 // Export
 export default router;
