@@ -158,14 +158,7 @@ export const RemoveStudentFromElective = async (
         new: true,
       },
     ); // Updating the Students
-    // remove from Elective array of student
-    // await Electives.findByIdAndUpdate(
-    //   electiveId,
-    //   { $pull: { students: studentId } },
-    //   {
-    //     new: true,
-    //   },
-    // ); // Updating the Elective
+
     await Electives.findByIdAndUpdate(
       electiveId,
       { $pull: { students: { studentId } } },
