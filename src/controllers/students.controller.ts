@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Students from '@models/students.model';
 import Schools from '@models/schools.model';
+import Electives from '@models/electives.model';
 import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
 // import School from '@/interfaces/schools.interface';
@@ -192,7 +193,13 @@ export const deleteStudent = async (req: Request, res: Response): Promise<Respon
   try {
     const studentId = req.params.studentId; // Getting student id from URL parameter
     console.log('studentId', studentId);
+    await Electives.updateMany(
+      { 'students.studentId': studentId },
+      { $pull: { students: { studentId } } },
+    );
+
     const user = await Students.findByIdAndDelete(studentId); // Deleting the student
+
     // when student delete pop student id from array of elective if exists
 
     return res.json({ success: true, user }); // Success
