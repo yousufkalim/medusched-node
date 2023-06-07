@@ -9,13 +9,17 @@ import School from '@interfaces/schools.interface';
 import Student from '@interfaces/students.interface';
 import { generateCSV } from '../utils/exportCSV';
 import { sendCSVEmail } from '../utils/sendEmail';
+import Auth from '@interfaces/auth.interface';
+import bcrypt from 'bcryptjs';
+import { JWT_SECRET, BCRYPT_SALT } from '@config';
+import jwt from 'jsonwebtoken';
 
 export const createSchool = async (req: IRequest, res: Response): Promise<Response> => {
   const body: School = req.body;
   const user = req.user as Admin;
 
   try {
-    const { email } = body; // Getting required fields from body
+    const { email, password } = body; // Getting required fields from body
     const { _id } = user;
     const admin = await Admins.findById(_id);
 
@@ -30,6 +34,7 @@ export const createSchool = async (req: IRequest, res: Response): Promise<Respon
       // If we found existing School in db
       return res.status(409).json({ success: false, message: 'School already exists.' });
     }
+    body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
 
     // // Creating Hospital
 
@@ -129,6 +134,43 @@ export const sendCSVToSchool = async (req: IRequest, res: Response): Promise<Res
       return res.status(409).json({ success: false, message: 'School has no students yet' });
     }
   } catch (err) {
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const loginSchool = async (req: IRequest, res: Response): Promise<Response> => {
+  const body: Auth = req.body;
+
+  try {
+    // Getting email and password
+    const { email, password } = body;
+
+    // Getting Hospital from db
+    const school = await Schools.findOne({ email });
+
+    if (!school) {
+      // If hospital not found
+      return res.status(404).json({ success: false, message: 'School not found' });
+    }
+    // Comparing password
+    const isMatched = bcrypt.compareSync(password, school.password);
+    if (!isMatched) {
+      // If password not matched
+      return res.status(400).json({ success: false, message: 'Invalid Password' });
+    }
+    // Creating payload with admin object
+    // @ts-expect-error
+    delete school.password; // Removing password from Hospital object
+    const payload = { user: school };
+
+    // Generating token
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+    // done
+    return res.json({ success: true, user: { ...school }, token });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
