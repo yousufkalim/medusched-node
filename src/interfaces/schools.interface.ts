@@ -8,8 +8,10 @@ export default interface School {
   students: Student[] | string[];
   hospitals: Hospital[] | string[];
   name: string;
+  password: string;
   domain_name: string;
   email: string;
   description: string;
   active: boolean;
+  role: string;
 }

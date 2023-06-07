@@ -24,6 +24,10 @@ const schoolSchema = new Schema(
       type: String,
       required: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
     domain_name: {
       type: String,
       required: true,
@@ -43,6 +47,10 @@ const schoolSchema = new Schema(
     active: {
       type: Boolean,
       default: true,
+    },
+    role: {
+      type: String,
+      default: 'school',
     },
   },
   {
