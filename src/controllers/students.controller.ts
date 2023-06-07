@@ -198,6 +198,9 @@ export const deleteStudent = async (req: Request, res: Response): Promise<Respon
       { $pull: { students: { studentId } } },
     );
 
+    //  remove student from school
+    await Schools.updateOne({ students: studentId }, { $pull: { students: studentId } });
+
     const user = await Students.findByIdAndDelete(studentId); // Deleting the student
 
     // when student delete pop student id from array of elective if exists
