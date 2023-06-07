@@ -30,6 +30,7 @@ router.post('/', createStudent);
 router.post('/login', loginStudent); // Hospital Login
 
 // Read
+router.get('/schoolStudents', checkUserAuth, getStudentsforSchool); // Get all students at once
 router.get('/', checkUserAuth, getAllStudents); // Get all students at once
 router.get('/:userId', checkUserAuth, getStudentById); // Get one student by it's id
 
@@ -43,8 +44,6 @@ router.put('/activate/:studentId', checkUserAuth, ActivateStudent); // delete a 
 router.put('/verifystudent/:token', VerifyStudent); // Verify Student
 
 router.put('/resetPassword/:studentId', checkUserAuth, resetStudentPassword); // Hospital Delete
-
-router.get('/schoolStudents', checkUserAuth, getStudentsforSchool); // Get all students at once
 
 // Export
 export default router;
