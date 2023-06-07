@@ -4,10 +4,11 @@ import Schools from '@models/schools.model';
 import Electives from '@models/electives.model';
 import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
-// import School from '@/interfaces/schools.interface';
+import School from '@/interfaces/schools.interface';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { BCRYPT_SALT, JWT_SECRET } from '@config';
+import IRequest from '@interfaces/request.interface';
 // import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
 // import { verifyStudent } from '@/utils/sendEmail';
 
@@ -254,6 +255,23 @@ export const resetStudentPassword = async (req: Request, res: Response): Promise
     // if a student register with school 1 then what we do if student(have electives) delete that link with school 1
 
     return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const getStudentsforSchool = async (_req: IRequest, res: Response): Promise<Response> => {
+  const school = _req.user as School;
+  try {
+    const { _id } = school;
+    const students = await Students.find({
+      school: _id,
+    }).sort({ start_date: 1 }); // Finding all the Electives from db
+
+    return res.json({ success: true, students }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
