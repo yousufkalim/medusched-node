@@ -6,13 +6,11 @@ import {
   updateSchool,
   deleteSchool,
   sendCSVToSchool,
-  loginSchool,
 } from '@controllers/schools.controller';
 import { checkAdminAuth } from '@middleware/auth.middleware';
 const router = Router();
 
 router.post('/', checkAdminAuth, createSchool); // Create - School
-router.post('/schoolLogin', loginSchool); // Create - School
 router.get('/', checkAdminAuth, getAllSchools); // Get all - School
 router.get('/forusers', getAllSchoolsforUser); // Get all - School
 router.put('/:schoolId', checkAdminAuth, updateSchool); // School Update
