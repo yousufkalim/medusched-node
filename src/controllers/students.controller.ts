@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Students from '@models/students.model';
 import Schools from '@models/schools.model';
+import Hospitals from '@models/hospitals.model';
 import Electives from '@models/electives.model';
 import Student from '@/interfaces/students.interface';
 import Auth from '@/interfaces/auth.interface';
@@ -23,11 +24,23 @@ export const createStudent = async (req: Request, res: Response): Promise<Respon
   try {
     const { email, password, school } = body; // Getting required fields from body
     const existingStudnet = await Students.findOne({ email }); // Finding already existing student
+    const existingEmailInSchool = await Schools.findOne({ email }); // Finding already existing school
+    const existingEmailInHospital = await Hospitals.findOne({ email }); // Finding already existing school
 
     // Extra Validations
     if (existingStudnet) {
       // If we found existing student in db
       return res.status(409).json({ success: false, message: 'Student already exists.' });
+    }
+    // Extra Validations
+    if (existingEmailInSchool) {
+      // If we found existing student in db
+      return res.status(409).json({ success: false, message: 'Email exists in school' });
+    }
+    // Extra Validations
+    if (existingEmailInHospital) {
+      // If we found existing student in db
+      return res.status(409).json({ success: false, message: 'Email exists in hospital' });
     }
 
     // Creating Studnet
@@ -59,34 +72,42 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
   const body: Auth = req.body;
 
   try {
-    // Getting email and password
     const { email, password } = body;
+    let payload;
 
-    // Getting student from db
     const student = await Students.findOne({ email });
-
-    if (!student) {
-      // If student not found
-      return res.status(404).json({ success: false, message: 'student not found' });
-    } else if (!student.active) {
-      // If student not found or not active
-      return res.status(400).json({ success: false, message: 'Account not active' });
+    const school = await Schools.findOne({ email });
+    if (student) {
+      console.log('student', student);
+      if (!student.active) {
+        // If student not found or not active
+        return res.status(400).json({ success: false, message: 'Account not active' });
+      }
+      const isMatched = bcrypt.compareSync(password, student.password);
+      if (!isMatched) {
+        return res.status(400).json({ success: false, message: 'Invalid Password' });
+      }
+      // @ts-expect-error
+      delete student.password;
+      payload = { user: student };
+    } else if (school) {
+      console.log('school', school);
+      if (!school.active) {
+        // If student not found or not active
+        return res.status(400).json({ success: false, message: 'Account not active' });
+      }
+      const isMatched = bcrypt.compareSync(password, school.password);
+      if (!isMatched) {
+        return res.status(400).json({ success: false, message: 'Invalid Password' });
+      }
+      // @ts-expect-error
+      delete school.password;
+      payload = { user: school };
+    } else {
+      return res.status(404).json({ success: false, message: 'user not found' });
     }
 
-    // Comparing password
-    const isMatched = bcrypt.compareSync(password, student.password);
-    if (!isMatched) {
-      // If password not matched
-      return res.status(400).json({ success: false, message: 'Invalid Password' });
-    }
-    // Creating payload with admin object
-    // @ts-expect-error
-    delete student.password; // Removing password from student object
-    const payload = { user: student };
-
-    // Generating token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
-
     // done
     return res.json({ success: true, student, token });
   } catch (err) {
