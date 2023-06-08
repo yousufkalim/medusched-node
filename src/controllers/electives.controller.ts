@@ -423,7 +423,10 @@ export const deleteElective = async (req: IRequest, res: Response): Promise<Resp
     console.log(elective?.students, 'elective');
     const allStudents: any = elective?.students;
     const studentEmails = allStudents?.map((item: IStudents) => item?.studentId?.email);
-    await sendmailtoStudentOnRemoveElective(studentEmails);
+    console.log('studentEmails', studentEmails);
+    if (studentEmails?.length > 0) {
+      await sendmailtoStudentOnRemoveElective(studentEmails);
+    }
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
