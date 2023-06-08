@@ -98,6 +98,9 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
     if (!getElective) {
       return res.status(409).json({ success: false, message: 'No Elective Found' });
     }
+    // console.log('getstudentAppliedElectives', getstudentAppliedElectives);
+    // console.log('getElective', getElective);
+    // console.log('studentId', studentId);
     const conflict = checkElectiveConflict(
       getstudentAppliedElectives || [],
       getElective,
@@ -420,7 +423,10 @@ export const deleteElective = async (req: IRequest, res: Response): Promise<Resp
     console.log(elective?.students, 'elective');
     const allStudents: any = elective?.students;
     const studentEmails = allStudents?.map((item: IStudents) => item?.studentId?.email);
-    await sendmailtoStudentOnRemoveElective(studentEmails);
+    console.log('studentEmails', studentEmails);
+    if (studentEmails?.length > 0) {
+      await sendmailtoStudentOnRemoveElective(studentEmails);
+    }
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
