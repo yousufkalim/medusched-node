@@ -74,6 +74,7 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
   try {
     const { email, password } = body;
     let payload;
+    let userRole;
 
     const student = await Students.findOne({ email });
     const school = await Schools.findOne({ email });
@@ -90,6 +91,7 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
       // @ts-expect-error
       delete student.password;
       payload = { user: student };
+      userRole = student.role;
     } else if (school) {
       console.log('school', school);
       if (!school.active) {
@@ -103,13 +105,14 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
       // @ts-expect-error
       delete school.password;
       payload = { user: school };
+      userRole = school.role;
     } else {
       return res.status(404).json({ success: false, message: 'user not found' });
     }
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
     // done
-    return res.json({ success: true, student, token });
+    return res.json({ success: true, userRole, token });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

@@ -98,6 +98,9 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
     if (!getElective) {
       return res.status(409).json({ success: false, message: 'No Elective Found' });
     }
+    // console.log('getstudentAppliedElectives', getstudentAppliedElectives);
+    // console.log('getElective', getElective);
+    // console.log('studentId', studentId);
     const conflict = checkElectiveConflict(
       getstudentAppliedElectives || [],
       getElective,

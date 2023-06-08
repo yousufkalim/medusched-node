@@ -84,15 +84,20 @@ export const checkUserAuth = async (
         message: 'You are not authorized to access this resource',
       });
     }
+    delete user.password;
 
     if (user.role === 'Hospital') {
       const hospital = await Hospitals.findById(user._id);
-
+      // @ts-expect-error
+      delete hospital?.password;
       req.user = hospital ?? user;
     } else if (user.role === 'student') {
       const student = await Students.findById(user._id);
+      // @ts-expect-error
+      delete student?.password;
       req.user = student ?? user;
     } else {
+      delete user.password;
       req.user = user;
     }
 
