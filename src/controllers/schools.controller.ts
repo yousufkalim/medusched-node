@@ -28,11 +28,22 @@ export const createSchool = async (req: IRequest, res: Response): Promise<Respon
       return res.status(409).json({ success: false, message: 'Invalid Token' });
     }
     const existingSchool = await Schools.findOne({ email }); // Finding already existing school
+    const existingEmailInStudent = await Students.findOne({ email }); // Finding already existing school
+    const existingEmailInHospital = await Hospitals.findOne({ email }); // Finding already existing school
 
     // Extra Validations
     if (existingSchool) {
       // If we found existing School in db
       return res.status(409).json({ success: false, message: 'School already exists.' });
+    }
+    // Extra Validations
+    if (existingEmailInStudent) {
+      // If we found existing School in db
+      return res.status(409).json({ success: false, message: 'email exists in student' });
+    }
+    if (existingEmailInHospital) {
+      // If we found existing School in db
+      return res.status(409).json({ success: false, message: 'email exists in hospital' });
     }
     body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
 
