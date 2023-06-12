@@ -101,3 +101,28 @@ export const confirmAuth = (req: IRequest, res: Response): Response => {
   // If user authenticated
   return res.json({ success: true, admin: req.user, token: req.token });
 };
+export const resetAdminPassword = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const adminId = req?.user?._id;
+    console.log('adminId', adminId);
+    const { oldPassword, newPassword } = req.body; // Getting admin  id from URL parameter
+    const admin = await Admins.findById(adminId); // Deleting the admin
+    console.log('admm', admin);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'admin not found' });
+    }
+    const isMatched = bcrypt.compareSync(oldPassword, admin.password);
+    if (!isMatched) {
+      return res.status(400).json({ success: false, message: 'Old Password not Correct' });
+    }
+    const password = bcrypt.hashSync(newPassword, BCRYPT_SALT);
+    await Admins.findByIdAndUpdate(adminId, { password }, { new: true });
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
