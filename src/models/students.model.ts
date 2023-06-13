@@ -8,6 +8,10 @@ const studentSchema = new Schema(
       type: String,
       required: true,
     },
+    lastName: {
+      type: String,
+      required: true,
+    },
     stdId: {
       type: String,
     },
