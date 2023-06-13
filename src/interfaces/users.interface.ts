@@ -3,7 +3,8 @@
  * @author Yousuf Kalim
  */
 export default interface User {
-  name: string;
+  firstName: string;
+  lastName: string;
   stdId?: string;
   email: string;
   password: string;

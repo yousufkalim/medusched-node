@@ -3,6 +3,7 @@ import Elective from './electives.interface';
 
 export default interface Student {
   name: string;
+  lastName: string;
   stdId: string;
   email: string;
   password: string;
