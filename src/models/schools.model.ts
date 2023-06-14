@@ -26,7 +26,6 @@ const schoolSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     domain_name: {
       type: String,
