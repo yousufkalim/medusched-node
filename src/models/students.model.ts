@@ -10,7 +10,6 @@ const studentSchema = new Schema(
     },
     lastName: {
       type: String,
-      required: true,
     },
     stdId: {
       type: String,
@@ -24,7 +23,6 @@ const studentSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 8,
     },
     logo: {
       type: String,
