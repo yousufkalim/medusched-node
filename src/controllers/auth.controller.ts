@@ -8,6 +8,7 @@ import Auth, { ChangePassword } from '@interfaces/auth.interface';
 import Users from '@models/users.model';
 import Hospitals from '@models/hospitals.model';
 import Students from '@models/students.model';
+import Schools from '@models/schools.model';
 import Electives from '@models/electives.model';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -140,18 +141,36 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
       return res.json({ success: true, message: 'Email sent successfully' });
     } else {
       const student = await Students.findOne({ email });
-      if (!student) {
-        return res.status(404).json({ success: false, message: 'User not found' });
+      const school = await Schools.findOne({ email });
+
+      if (student) {
+        console.log('student', student);
+        if (!student.active) {
+          // If student not found or not active
+          return res.status(400).json({ success: false, message: 'Account not active' });
+        }
+        // Generating token
+        const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
+        console.log('token2222', token, email);
+        // Sending email to hospital
+        await sendForgotEmail(email, `${ORIGIN}/reset/${token}`);
+        // Done
+        return res.json({ success: true, message: 'Email sent successfully' });
+      } else if (school) {
+        console.log('school', school);
+        if (!school.active) {
+          // If student not found or not active
+          return res.status(400).json({ success: false, message: 'Account not active' });
+        }
+        // Generating token
+        const token = jwt.sign({ user: school }, JWT_SECRET, { expiresIn: '15m' });
+        console.log('token2222 school', token, email);
+        // Sending email to hospital
+        await sendForgotEmail(email, `${ORIGIN}/reset/${token}`);
+      } else {
+        return res.status(404).json({ success: false, message: 'user not found' });
       }
-      // Generating token
-      const token = jwt.sign({ user: student }, JWT_SECRET, { expiresIn: '15m' });
-      console.log('student email');
-
-      // Sending email to hospital
-      await sendForgotEmail(email, `${ORIGIN}/reset/${token}`);
-
-      // Done
-      return res.json({ success: true, message: 'Email 2 sent successfully' });
+      return res.json({ success: true, message: 'Email sent successfully' });
     }
   } catch (err) {
     // Error handling
@@ -186,7 +205,14 @@ export const evaluationemail = async (req: IRequest, res: Response): Promise<Res
 
     // Sending email to hospital
     // attachment path
-    const attachmentPath = path.join(__dirname, '..', '..', 'src', 'utils', `assementmedusched.pdf`);
+    const attachmentPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'src',
+      'utils',
+      `assementmedusched.pdf`,
+    );
     const studentName = student?.name;
     const ElectiveName = elective?.title;
     const startDate = moment(elective?.start_date).format('MM-DD-YYYY');
@@ -232,6 +258,15 @@ export const verifyToken = async (req: Request, res: Response): Promise<Response
         message: 'Token verified successfully',
         userId: student?._id,
       });
+    } else if (decoded?.user?.role === 'school') {
+      const school = await Schools.findById(decoded?.user?._id);
+
+      console.log('user', school);
+      return res.status(200).json({
+        success: true,
+        message: 'Token verified successfully',
+        userId: school?._id,
+      });
     } else {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -248,6 +283,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<Respon
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const hospital = await Hospitals.findById(decoded.user._id);
     const student = await Students.findById(decoded.user._id);
+    const school = await Schools.findById(decoded.user._id);
     if (student) {
       student.password = bcrypt.hashSync(req.body.password, 10);
       student.active = true;
@@ -262,6 +298,13 @@ export const resetPassword = async (req: Request, res: Response): Promise<Respon
       return res
         .status(200)
         .json({ success: true, message: 'Password updated successfully', role: hospital.role });
+    } else if (school) {
+      school.password = bcrypt.hashSync(req.body.password, 10);
+      school.active = true;
+      await school.save();
+      return res
+        .status(200)
+        .json({ success: true, message: 'Password updated successfully', role: school.role });
     } else {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
