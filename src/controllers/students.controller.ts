@@ -98,6 +98,12 @@ export const loginStudent = async (req: Request, res: Response): Promise<Respons
         // If student not found or not active
         return res.status(400).json({ success: false, message: 'Account not active' });
       }
+      if (!school.password) {
+        // If student not found or not active
+        return res
+          .status(400)
+          .json({ success: false, message: 'Please verify your email or reset password' });
+      }
       const isMatched = bcrypt.compareSync(password, school.password);
       if (!isMatched) {
         return res.status(400).json({ success: false, message: 'Invalid Password' });
