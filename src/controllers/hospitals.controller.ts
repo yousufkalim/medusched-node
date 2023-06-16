@@ -59,6 +59,12 @@ export const updateHospital = async (req: IRequest, res: Response): Promise<Resp
     const hospitalId = req.params.hospitalId; // Getting hospitalId from URL parameter
     console.log('hospitalId', hospitalId);
 
+    const existingHospital = await Hospitals.findOne({ email: body?.email });
+
+    if (existingHospital && existingHospital._id !== hospitalId) {
+      return res.status(409).json({ success: false, message: 'Hospital already exists.' });
+    }
+
     // If Hospital user want to update it's password
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
