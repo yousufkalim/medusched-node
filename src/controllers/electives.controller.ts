@@ -115,6 +115,7 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
       });
     }
 
+    await sendApplyConfirmationEmail(student?.email as string);
     await Students.findByIdAndUpdate(
       studentId,
       {
@@ -138,7 +139,6 @@ export const applyElective = async (req: IRequest, res: Response): Promise<Respo
     );
     //  student should receive email to applied electives
 
-    await sendApplyConfirmationEmail(student?.email as string);
     return res.json({ success: true, message: 'Applied successfully' }); // Success
   } catch (err) {
     // Error handling
